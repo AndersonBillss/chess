@@ -1,0 +1,1 @@
+These are my notes for the CS 240 chess project
