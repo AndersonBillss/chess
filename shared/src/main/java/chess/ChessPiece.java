@@ -1,9 +1,6 @@
 package chess;
 
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -40,7 +37,7 @@ public class ChessPiece {
                 PieceType.PAWN, "p");
 
         String pieceString = pieceToString.get(type);
-        if (pieceColor == ChessGame.TeamColor.WHITE){
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
             pieceString = pieceString.toUpperCase();
         }
         return pieceString;
@@ -85,6 +82,56 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        var piece = board.getPiece(myPosition);
+        if (piece.type == PieceType.ROOK) {
+            return rookMoves(board, myPosition, piece.getTeamColor());
+        }
+        return List.of();
+    }
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] directions = {
+                ChessPosition.forward(teamColor),
+                ChessPosition.backward(teamColor),
+                ChessPosition.left(teamColor),
+                ChessPosition.right(teamColor),
+        };
+
+        for (var direction : directions) {
+            moves.addAll(moveLine(board, position, teamColor, direction));
+        }
+        return moves;
+    }
+
+    private boolean canOvertake(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        if (!board.inBounds(position)) {
+            return false;
+        }
+        var piece = board.getPiece(position);
+        if (piece == null) {
+            return true;
+        }
+        return piece.getTeamColor() != teamColor;
+    }
+
+    private Collection<ChessMove> moveLine(
+            ChessBoard board,
+            ChessPosition position,
+            ChessGame.TeamColor teamColor, ChessPosition direction) {
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        var newMove = position.add(direction);
+        if (!board.inBounds(newMove)) {
+            return moves;
+        }
+        while (canOvertake(board, newMove, teamColor)) {
+            moves.add(new ChessMove(position, newMove, null));
+            if (!board.inBounds(newMove) || board.getPiece(newMove) != null) {
+                break;
+            }
+            newMove = newMove.add(direction);
+        }
+        return moves;
     }
 }

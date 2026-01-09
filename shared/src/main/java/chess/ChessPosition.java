@@ -31,18 +31,25 @@ public class ChessPosition {
     }
 
     static public ChessPosition left(ChessGame.TeamColor team) {
-        ChessPosition forward = forward(team);
-        return new ChessPosition(-forward.getColumn(), forward.getRow());
+        if (team == ChessGame.TeamColor.BLACK) {
+            return new ChessPosition(1, 0);
+        }
+        return new ChessPosition(-1, 0);
     }
 
     static public ChessPosition right(ChessGame.TeamColor team) {
         ChessPosition left = left(team);
-        return new ChessPosition(left.getRow(), -left.getColumn());
+        return new ChessPosition(-left.getRow(), left.getColumn());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
+    }
+
+    @Override
+    public String toString() {
+        return "{" + row + ", " + col + "}";
     }
 
     private int row;
@@ -69,8 +76,7 @@ public class ChessPosition {
         return col;
     }
 
-    public void add(ChessPosition position) {
-        this.row += position.row;
-        this.col += position.col;
+    public ChessPosition add(ChessPosition position) {
+        return new ChessPosition(row + position.row, col + position.col);
     }
 }
