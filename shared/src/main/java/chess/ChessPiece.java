@@ -89,6 +89,8 @@ public class ChessPiece {
             return bishopMoves(board, myPosition, piece.getTeamColor());
         } else if (piece.type == PieceType.QUEEN) {
             return queenMoves(board, myPosition, piece.getTeamColor());
+        } else if (piece.type == PieceType.KING) {
+            return kingMoves(board, myPosition, piece.getTeamColor());
         }
         return List.of();
     }
@@ -126,6 +128,28 @@ public class ChessPiece {
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = bishopMoves(board, position, teamColor);
         moves.addAll(rookMoves(board, position, teamColor));
+        return moves;
+    }
+
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] directions = {
+                ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)),
+                ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)),
+                ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor)),
+                ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor)),
+                ChessPosition.forward(teamColor),
+                ChessPosition.backward(teamColor),
+                ChessPosition.left(teamColor),
+                ChessPosition.right(teamColor),
+        };
+
+        for (var direction : directions) {
+            var newPosition = position.add(direction);
+            if (canOvertake(board, newPosition, teamColor)) {
+                moves.add(new ChessMove(position, newPosition, null));
+            }
+        }
         return moves;
     }
 
