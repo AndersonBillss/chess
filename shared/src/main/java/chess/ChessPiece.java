@@ -91,6 +91,8 @@ public class ChessPiece {
             return queenMoves(board, myPosition, piece.getTeamColor());
         } else if (piece.type == PieceType.KING) {
             return kingMoves(board, myPosition, piece.getTeamColor());
+        } else if (piece.type == PieceType.KNIGHT) {
+            return knightMoves(board, myPosition, piece.getTeamColor());
         }
         return List.of();
     }
@@ -142,6 +144,28 @@ public class ChessPiece {
                 ChessPosition.backward(teamColor),
                 ChessPosition.left(teamColor),
                 ChessPosition.right(teamColor),
+        };
+
+        for (var direction : directions) {
+            var newPosition = position.add(direction);
+            if (canOvertake(board, newPosition, teamColor)) {
+                moves.add(new ChessMove(position, newPosition, null));
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] directions = {
+                ChessPosition.forward(teamColor).add(ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor))),
+                ChessPosition.forward(teamColor).add(ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor))),
+                ChessPosition.backward(teamColor).add(ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor))),
+                ChessPosition.backward(teamColor).add(ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor))),
+                ChessPosition.left(teamColor).add(ChessPosition.left(teamColor).add(ChessPosition.forward(teamColor))),
+                ChessPosition.left(teamColor).add(ChessPosition.left(teamColor).add(ChessPosition.backward(teamColor))),
+                ChessPosition.right(teamColor).add(ChessPosition.right(teamColor).add(ChessPosition.forward(teamColor))),
+                ChessPosition.right(teamColor).add(ChessPosition.right(teamColor).add(ChessPosition.backward(teamColor))),
         };
 
         for (var direction : directions) {
