@@ -93,6 +93,8 @@ public class ChessPiece {
             return kingMoves(board, myPosition, piece.getTeamColor());
         } else if (piece.type == PieceType.KNIGHT) {
             return knightMoves(board, myPosition, piece.getTeamColor());
+        } else if (piece.type == PieceType.PAWN) {
+            return pawnMoves(board, myPosition, piece.getTeamColor());
         }
         return List.of();
     }
@@ -158,14 +160,14 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition[] directions = {
-                ChessPosition.forward(teamColor).add(ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor))),
-                ChessPosition.forward(teamColor).add(ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor))),
-                ChessPosition.backward(teamColor).add(ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor))),
-                ChessPosition.backward(teamColor).add(ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor))),
-                ChessPosition.left(teamColor).add(ChessPosition.left(teamColor).add(ChessPosition.forward(teamColor))),
-                ChessPosition.left(teamColor).add(ChessPosition.left(teamColor).add(ChessPosition.backward(teamColor))),
-                ChessPosition.right(teamColor).add(ChessPosition.right(teamColor).add(ChessPosition.forward(teamColor))),
-                ChessPosition.right(teamColor).add(ChessPosition.right(teamColor).add(ChessPosition.backward(teamColor))),
+                ChessPosition.forward(teamColor).mul(2).add(ChessPosition.left(teamColor)),
+                ChessPosition.forward(teamColor).mul(2).add(ChessPosition.right(teamColor)),
+                ChessPosition.backward(teamColor).mul(2).add(ChessPosition.right(teamColor)),
+                ChessPosition.backward(teamColor).mul(2).add(ChessPosition.left(teamColor)),
+                ChessPosition.left(teamColor).mul(2).add(ChessPosition.forward(teamColor)),
+                ChessPosition.left(teamColor).mul(2).add(ChessPosition.backward(teamColor)),
+                ChessPosition.right(teamColor).mul(2).add(ChessPosition.forward(teamColor)),
+                ChessPosition.right(teamColor).mul(2).add(ChessPosition.backward(teamColor)),
         };
 
         for (var direction : directions) {
@@ -173,6 +175,46 @@ public class ChessPiece {
             if (canOvertake(board, newPosition, teamColor)) {
                 moves.add(new ChessMove(position, newPosition, null));
             }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition forwardOne = position.add(ChessPosition.forward(teamColor));
+        if (board.inBounds(forwardOne) && board.getPiece(forwardOne) == null) {
+            moves.addAll(pawnPromotion(board, position, forwardOne, teamColor));
+        }
+        ChessPosition backwardOne = position.add(ChessPosition.backward(teamColor));
+        ChessPosition backwardTwo = position.add(ChessPosition.backward(teamColor).mul(2));
+        ChessPosition forwardTwo = position.add(ChessPosition.forward(teamColor).mul(2));
+        var canMoveTwo = !board.inBounds(backwardTwo) && board.inBounds(backwardOne);
+        if (canMoveTwo && board.getPiece(forwardTwo) == null && board.getPiece(forwardOne) == null) {
+            moves.add(new ChessMove(position, forwardTwo, null));
+        }
+
+        var forwardLeft = position.add(ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)));
+        var forwardRight = position.add(ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)));
+        if (canOvertake(board, forwardLeft, teamColor) && board.getPiece(forwardLeft) != null) {
+            moves.addAll(pawnPromotion(board, position, forwardLeft, teamColor));
+        }
+        if (canOvertake(board, forwardRight, teamColor) && board.getPiece(forwardRight) != null) {
+            moves.addAll(pawnPromotion(board, position, forwardRight, teamColor));
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> pawnPromotion(ChessBoard board, ChessPosition oldPosition, ChessPosition newPosition, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        var forwardTwo = newPosition.add(ChessPosition.forward(teamColor).mul(2));
+        var canPromote = !board.inBounds(forwardTwo);
+        if (canPromote) {
+            moves.add(new ChessMove(oldPosition, newPosition, PieceType.QUEEN));
+            moves.add(new ChessMove(oldPosition, newPosition, PieceType.BISHOP));
+            moves.add(new ChessMove(oldPosition, newPosition, PieceType.ROOK));
+            moves.add(new ChessMove(oldPosition, newPosition, PieceType.KNIGHT));
+        } else {
+            moves.add(new ChessMove(oldPosition, newPosition, null));
         }
         return moves;
     }
