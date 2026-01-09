@@ -18,13 +18,35 @@ public class ChessPosition {
         return row == that.row && col == that.col;
     }
 
+    static public ChessPosition forward(ChessGame.TeamColor team) {
+        if (team == ChessGame.TeamColor.BLACK) {
+            return new ChessPosition(0, -1);
+        }
+        return new ChessPosition(0, 1);
+    }
+
+    static public ChessPosition backward(ChessGame.TeamColor team) {
+        ChessPosition forward = forward(team);
+        return new ChessPosition(forward.getRow(), -forward.getColumn());
+    }
+
+    static public ChessPosition left(ChessGame.TeamColor team) {
+        ChessPosition forward = forward(team);
+        return new ChessPosition(-forward.getColumn(), forward.getRow());
+    }
+
+    static public ChessPosition right(ChessGame.TeamColor team) {
+        ChessPosition left = left(team);
+        return new ChessPosition(left.getRow(), -left.getColumn());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
     }
 
-    private final int row;
-    private final int col;
+    private int row;
+    private int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -45,5 +67,10 @@ public class ChessPosition {
      */
     public int getColumn() {
         return col;
+    }
+
+    public void add(ChessPosition position) {
+        this.row += position.row;
+        this.col += position.col;
     }
 }
