@@ -87,6 +87,8 @@ public class ChessPiece {
             return rookMoves(board, myPosition, piece.getTeamColor());
         } else if (piece.type == PieceType.BISHOP) {
             return bishopMoves(board, myPosition, piece.getTeamColor());
+        } else if (piece.type == PieceType.QUEEN) {
+            return queenMoves(board, myPosition, piece.getTeamColor());
         }
         return List.of();
     }
@@ -118,6 +120,12 @@ public class ChessPiece {
         for (var direction : directions) {
             moves.addAll(moveLine(board, position, teamColor, direction));
         }
+        return moves;
+    }
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = bishopMoves(board, position, teamColor);
+        moves.addAll(rookMoves(board, position, teamColor));
         return moves;
     }
 
