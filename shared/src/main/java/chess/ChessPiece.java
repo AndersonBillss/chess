@@ -85,6 +85,8 @@ public class ChessPiece {
         var piece = board.getPiece(myPosition);
         if (piece.type == PieceType.ROOK) {
             return rookMoves(board, myPosition, piece.getTeamColor());
+        } else if (piece.type == PieceType.BISHOP) {
+            return bishopMoves(board, myPosition, piece.getTeamColor());
         }
         return List.of();
     }
@@ -96,6 +98,21 @@ public class ChessPiece {
                 ChessPosition.backward(teamColor),
                 ChessPosition.left(teamColor),
                 ChessPosition.right(teamColor),
+        };
+
+        for (var direction : directions) {
+            moves.addAll(moveLine(board, position, teamColor, direction));
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] directions = {
+                ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)),
+                ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)),
+                ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor)),
+                ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor)),
         };
 
         for (var direction : directions) {
