@@ -1,5 +1,10 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import static chess.ChessPiece.PieceType.*;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -9,10 +14,28 @@ package chess;
 public class ChessBoard {
     private ChessPiece[][] board;
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
+
     public ChessBoard() {
         board = new ChessPiece[8][8];
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
+        clearBoard();
+    }
+
+    private void clearBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 board[i][j] = null;
             }
         }
@@ -25,7 +48,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()][position.getColumn()] = piece;
+        board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -36,7 +59,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()][position.getColumn()];
+        return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -44,6 +67,23 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        clearBoard();
+        ChessPiece.PieceType[][] pieceTypes = {
+                {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK},
+                {PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN}
+        };
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = new ChessPiece(ChessGame.TeamColor.WHITE, pieceTypes[i][j]);
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 8; j++) {
+                int flippedIlookup = 1 - i;
+                int flippedIposition = 7 - i;
+                board[flippedIposition][j] = new ChessPiece(ChessGame.TeamColor.BLACK, pieceTypes[flippedIlookup][j]);
+            }
+        }
     }
 }
