@@ -28,6 +28,26 @@ public class ChessBoard {
         return Arrays.deepHashCode(board);
     }
 
+    @Override
+    public String toString() {
+        String finalString = "";
+        for (int i = 7; i > -1; i--) {
+            var row = board[i];
+            finalString += "|";
+            for (var col : row) {
+                if (col == null) {
+                    finalString += " ";
+                } else {
+                    finalString += col;
+                }
+                ;
+                finalString += "|";
+            }
+            finalString += "\n";
+        }
+        return finalString;
+    }
+
     public ChessBoard() {
         board = new ChessPiece[8][8];
         clearBoard();
@@ -80,9 +100,8 @@ public class ChessBoard {
         }
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 8; j++) {
-                int flippedIlookup = 1 - i;
-                int flippedIposition = 7 - i;
-                board[flippedIposition][j] = new ChessPiece(ChessGame.TeamColor.BLACK, pieceTypes[flippedIlookup][j]);
+                int flippedIndexPosition = 7 - i;
+                board[flippedIndexPosition][j] = new ChessPiece(ChessGame.TeamColor.BLACK, pieceTypes[i][j]);
             }
         }
     }

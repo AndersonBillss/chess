@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Dictionary;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,6 +27,23 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
+    }
+
+    @Override
+    public String toString() {
+        final Map<PieceType, String> pieceToString = Map.of(
+                PieceType.KING, "k",
+                PieceType.QUEEN, "q",
+                PieceType.BISHOP, "b",
+                PieceType.KNIGHT, "n",
+                PieceType.ROOK, "r",
+                PieceType.PAWN, "p");
+
+        String pieceString = pieceToString.get(type);
+        if (pieceColor == ChessGame.TeamColor.WHITE){
+            pieceString = pieceString.toUpperCase();
+        }
+        return pieceString;
     }
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
