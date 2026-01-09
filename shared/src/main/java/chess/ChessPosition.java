@@ -8,12 +8,12 @@ package chess;
  */
 public class ChessPosition {
 
-    private final int _row;
-    private final int _col;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
-        _row = row;
-        _col = col;
+        this.row = row;
+        this.col = col;
     }
 
     /**
@@ -21,7 +21,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return _row;
+        return row;
     }
 
     /**
@@ -29,6 +29,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return _col;
+        return col;
     }
 }

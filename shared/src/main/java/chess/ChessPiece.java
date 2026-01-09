@@ -9,13 +9,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor _pieceColor;
-    private ChessPiece.PieceType _type;
+    private final ChessGame.TeamColor pieceColor;
+    private final ChessPiece.PieceType type;
 
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        _pieceColor = pieceColor;
-        _type = type;
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -34,14 +34,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return _pieceColor;
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return _type;
+        return type;
     }
 
     /**
