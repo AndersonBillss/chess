@@ -43,6 +43,31 @@ public class ChessPiece {
         return pieceString;
     }
 
+    private ChessPosition forward() {
+        if (pieceColor == ChessGame.TeamColor.BLACK) {
+            return new ChessPosition(-1, 0);
+        }
+        return new ChessPosition(1, 0);
+    }
+
+    private ChessPosition backward() {
+        ChessPosition forward = forward();
+        return new ChessPosition(-forward.getRow(), forward.getColumn());
+    }
+
+    private ChessPosition left() {
+        if (pieceColor == ChessGame.TeamColor.BLACK) {
+            return new ChessPosition(0, -1);
+        }
+        return new ChessPosition(0, 1);
+    }
+
+    private ChessPosition right() {
+        ChessPosition left = left();
+        return new ChessPosition(left.getRow(), -left.getColumn());
+    }
+
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -102,10 +127,10 @@ public class ChessPiece {
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition[] directions = {
-                ChessPosition.forward(teamColor),
-                ChessPosition.backward(teamColor),
-                ChessPosition.left(teamColor),
-                ChessPosition.right(teamColor),
+                forward(),
+                backward(),
+                left(),
+                right(),
         };
 
         for (var direction : directions) {
@@ -117,10 +142,10 @@ public class ChessPiece {
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition[] directions = {
-                ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)),
-                ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)),
-                ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor)),
-                ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor)),
+                forward().add(right()),
+                forward().add(left()),
+                backward().add(right()),
+                backward().add(left()),
         };
 
         for (var direction : directions) {
@@ -138,14 +163,14 @@ public class ChessPiece {
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition[] directions = {
-                ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)),
-                ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)),
-                ChessPosition.backward(teamColor).add(ChessPosition.right(teamColor)),
-                ChessPosition.backward(teamColor).add(ChessPosition.left(teamColor)),
-                ChessPosition.forward(teamColor),
-                ChessPosition.backward(teamColor),
-                ChessPosition.left(teamColor),
-                ChessPosition.right(teamColor),
+                forward().add(right()),
+                forward().add(left()),
+                backward().add(right()),
+                backward().add(left()),
+                forward(),
+                backward(),
+                left(),
+                right(),
         };
 
         for (var direction : directions) {
@@ -160,14 +185,14 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition[] directions = {
-                ChessPosition.forward(teamColor).mul(2).add(ChessPosition.left(teamColor)),
-                ChessPosition.forward(teamColor).mul(2).add(ChessPosition.right(teamColor)),
-                ChessPosition.backward(teamColor).mul(2).add(ChessPosition.right(teamColor)),
-                ChessPosition.backward(teamColor).mul(2).add(ChessPosition.left(teamColor)),
-                ChessPosition.left(teamColor).mul(2).add(ChessPosition.forward(teamColor)),
-                ChessPosition.left(teamColor).mul(2).add(ChessPosition.backward(teamColor)),
-                ChessPosition.right(teamColor).mul(2).add(ChessPosition.forward(teamColor)),
-                ChessPosition.right(teamColor).mul(2).add(ChessPosition.backward(teamColor)),
+                forward().mul(2).add(left()),
+                forward().mul(2).add(right()),
+                backward().mul(2).add(right()),
+                backward().mul(2).add(left()),
+                left().mul(2).add(forward()),
+                left().mul(2).add(backward()),
+                right().mul(2).add(forward()),
+                right().mul(2).add(backward()),
         };
 
         for (var direction : directions) {
@@ -181,20 +206,20 @@ public class ChessPiece {
 
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
-        ChessPosition forwardOne = position.add(ChessPosition.forward(teamColor));
+        ChessPosition forwardOne = position.add(forward());
         if (board.inBounds(forwardOne) && board.getPiece(forwardOne) == null) {
             moves.addAll(pawnPromotion(board, position, forwardOne, teamColor));
         }
-        ChessPosition backwardOne = position.add(ChessPosition.backward(teamColor));
-        ChessPosition backwardTwo = position.add(ChessPosition.backward(teamColor).mul(2));
-        ChessPosition forwardTwo = position.add(ChessPosition.forward(teamColor).mul(2));
+        ChessPosition backwardOne = position.add(backward());
+        ChessPosition backwardTwo = position.add(backward().mul(2));
+        ChessPosition forwardTwo = position.add(forward().mul(2));
         var canMoveTwo = !board.inBounds(backwardTwo) && board.inBounds(backwardOne);
         if (canMoveTwo && board.getPiece(forwardTwo) == null && board.getPiece(forwardOne) == null) {
             moves.add(new ChessMove(position, forwardTwo, null));
         }
 
-        var forwardLeft = position.add(ChessPosition.forward(teamColor).add(ChessPosition.left(teamColor)));
-        var forwardRight = position.add(ChessPosition.forward(teamColor).add(ChessPosition.right(teamColor)));
+        var forwardLeft = position.add(forward().add(left()));
+        var forwardRight = position.add(forward().add(right()));
         if (canOvertake(board, forwardLeft, teamColor) && board.getPiece(forwardLeft) != null) {
             moves.addAll(pawnPromotion(board, position, forwardLeft, teamColor));
         }
@@ -206,7 +231,7 @@ public class ChessPiece {
 
     private Collection<ChessMove> pawnPromotion(ChessBoard board, ChessPosition oldPosition, ChessPosition newPosition, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
-        var forwardTwo = newPosition.add(ChessPosition.forward(teamColor).mul(2));
+        var forwardTwo = newPosition.add(forward().mul(2));
         var canPromote = !board.inBounds(forwardTwo);
         if (canPromote) {
             moves.add(new ChessMove(oldPosition, newPosition, PieceType.QUEEN));

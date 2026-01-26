@@ -1,5 +1,6 @@
 package chess;
 
+import java.io.Console;
 import java.util.Arrays;
 import java.util.Objects;
 
