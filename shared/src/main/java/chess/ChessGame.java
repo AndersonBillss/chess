@@ -66,20 +66,18 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var piece = board.getPiece(startPosition);
-        var opposingTeam = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
-            ArrayList<ChessMove> validKingMoves = new ArrayList<>();
-            var opposingTeamMoves = getAllMovePositions(opposingTeam, board);
-            for (var move : kingMoves) {
-                if (!opposingTeamMoves.contains(move.getEndPosition())) {
-                    validKingMoves.add(move);
-                }
+        var pieceMoves = piece.pieceMoves(board, startPosition);
+        ArrayList<ChessMove> result = new ArrayList<>();
+        for (var move : pieceMoves) {
+            var boardCopy = new ChessBoard(board);
+            var movingPiece = boardCopy.getPiece(move.getStartPosition());
+            boardCopy.addPiece(move.getStartPosition(), null);
+            boardCopy.addPiece(move.getEndPosition(), movingPiece);
+            if (!isInCheck(piece.getTeamColor(), boardCopy)) {
+                result.add(move);
             }
-            return validKingMoves;
-        } else {
-            return piece.pieceMoves(board, startPosition);
         }
+        return result;
     }
 
     /**
@@ -105,9 +103,13 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        return isInCheck(teamColor, this.board);
+    }
+
+    public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
         Set<ChessPosition> opposingTeamPotentialMoves = getAllMovePositions(opposingTeam, board);
-        var king = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
+        var king = findPieces(teamColor, ChessPiece.PieceType.KING, board).getFirst();
         return opposingTeamPotentialMoves.contains(king);
     }
 
