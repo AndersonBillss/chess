@@ -28,7 +28,7 @@ public class ChessMove {
         this.specialMove = null;
     }
 
-    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece,
                      SpecialMove specialMove) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
