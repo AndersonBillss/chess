@@ -144,7 +144,9 @@ public class ChessGame {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition cell = new ChessPosition(i, j);
                 var piece = board.getPiece(cell);
-                if(piece == null) continue;
+                if (piece == null) {
+                    continue;
+                }
                 if (piece.getPieceType() == type && piece.getTeamColor() == teamColor) {
                     pieces.add(cell);
                 }
@@ -159,7 +161,9 @@ public class ChessGame {
             for (int j = 1; j <= 8; j++) {
                 var piecePos = new ChessPosition(i, j);
                 var piece = board.getPiece(piecePos);
-                if(piece == null) continue;
+                if (piece == null) {
+                    continue;
+                }
                 if (piece.getTeamColor() == teamColor) {
                     var pieceMoves = piece.pieceMoves(board, piecePos);
                     for (var move : pieceMoves) {
