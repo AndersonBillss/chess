@@ -120,21 +120,27 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
-        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam, board);
         var kingPos = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
         var king = board.getPiece(kingPos);
-        ArrayList<ChessPosition> potentialKingPositions = new ArrayList<>();
-        potentialKingPositions.add(kingPos);
-        var kingMoves = king.pieceMoves(board, kingPos);
-        for (var move : kingMoves) {
-            potentialKingPositions.add(move.getEndPosition());
+
+        Set<ChessPosition> opposingTeamMoves = getAllMoves(opposingTeam, board);
+        if (!opposingTeamMoves.contains(kingPos)) {
+            return false;
         }
 
-        for (var pos : potentialKingPositions) {
-            if (!opposingTeamPotentialMoves.contains(pos)) {
+        var kingMoves = king.pieceMoves(board, kingPos);
+        for (var move : kingMoves) {
+            // Make the move on a copy of the board
+            var boardCopy = new ChessBoard(board);
+            boardCopy.addPiece(move.getStartPosition(), null);
+            boardCopy.addPiece(move.getEndPosition(), king);
+            opposingTeamMoves = getAllMoves(opposingTeam, boardCopy);
+
+            if (!opposingTeamMoves.contains(kingPos)) {
                 return false;
             }
         }
+
         return true;
     }
 

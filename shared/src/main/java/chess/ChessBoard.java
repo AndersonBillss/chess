@@ -82,13 +82,16 @@ public class ChessBoard {
 
     public ChessBoard(ChessBoard board) {
         this.board = new ChessPiece[8][8];
+        clearBoard();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i, j);
-                addPiece(pos, board.getPiece(pos));
+                var otherPiece = board.getPiece(pos);
+                if (otherPiece != null) {
+                    this.addPiece(pos, new ChessPiece(otherPiece));
+                }
             }
         }
-        clearBoard();
     }
 
     private void clearBoard() {
