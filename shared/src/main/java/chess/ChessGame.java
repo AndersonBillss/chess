@@ -84,6 +84,10 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
+        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam);
+        var king = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
+        return opposingTeamPotentialMoves.contains(king);
     }
 
     /**
