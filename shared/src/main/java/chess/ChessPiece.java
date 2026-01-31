@@ -254,10 +254,30 @@ public class ChessPiece {
         }
 
         // En Passant
-        var left = position.add(left());
-        var right = position.add(right());
-        
-
+        var leftCell = position.add(left());
+        if (board.inBounds(leftCell)) {
+            var leftPiece = board.getPiece(leftCell);
+            if (leftPiece.getCanBeTakenWithEnPassant()) {
+                ChessMove enPassantMove = new ChessMove(
+                        position,
+                        forwardLeft,
+                        null,
+                        ChessMove.SpecialMove.EN_PASSANT);
+                moves.add(enPassantMove);
+            }
+        }
+        var rightCell = position.add(right());
+        if (board.inBounds(rightCell)) {
+            var rightPiece = board.getPiece(rightCell);
+            if (rightPiece.getCanBeTakenWithEnPassant()) {
+                ChessMove enPassantMove = new ChessMove(
+                        position,
+                        forwardRight,
+                        null,
+                        ChessMove.SpecialMove.EN_PASSANT);
+                moves.add(enPassantMove);
+            }
+        }
         return moves;
     }
 
