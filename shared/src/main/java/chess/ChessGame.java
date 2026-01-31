@@ -71,7 +71,7 @@ public class ChessGame {
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
             ArrayList<ChessMove> validKingMoves = new ArrayList<>();
-            var opposingTeamMoves = getAllMoves(opposingTeam);
+            var opposingTeamMoves = getAllMoves(opposingTeam, board);
             for (var move : kingMoves) {
                 if (!opposingTeamMoves.contains(move.getEndPosition())) {
                     validKingMoves.add(move);
@@ -107,7 +107,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
-        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam);
+        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam, board);
         var king = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
         return opposingTeamPotentialMoves.contains(king);
     }
@@ -120,7 +120,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
-        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam);
+        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam, board);
         var kingPos = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
         var king = board.getPiece(kingPos);
         ArrayList<ChessPosition> potentialKingPositions = new ArrayList<>();
@@ -155,7 +155,7 @@ public class ChessGame {
         return pieces;
     }
 
-    private Set<ChessPosition> getAllMoves(TeamColor teamColor) {
+    private Set<ChessPosition> getAllMoves(TeamColor teamColor, ChessBoard board) {
         Set<ChessPosition> allMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
