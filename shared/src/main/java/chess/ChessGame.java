@@ -1,6 +1,5 @@
 package chess;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -71,7 +70,7 @@ public class ChessGame {
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
             ArrayList<ChessMove> validKingMoves = new ArrayList<>();
-            var opposingTeamMoves = getAllMoves(opposingTeam, board);
+            var opposingTeamMoves = getAllMovePositions(opposingTeam, board);
             for (var move : kingMoves) {
                 if (!opposingTeamMoves.contains(move.getEndPosition())) {
                     validKingMoves.add(move);
@@ -107,7 +106,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
-        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam, board);
+        Set<ChessPosition> opposingTeamPotentialMoves = getAllMovePositions(opposingTeam, board);
         var king = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
         return opposingTeamPotentialMoves.contains(king);
     }
@@ -123,7 +122,7 @@ public class ChessGame {
         var kingPos = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
         var king = board.getPiece(kingPos);
 
-        Set<ChessPosition> opposingTeamMoves = getAllMoves(opposingTeam, board);
+        Set<ChessPosition> opposingTeamMoves = getAllMovePositions(opposingTeam, board);
         if (!opposingTeamMoves.contains(kingPos)) {
             return false;
         }
@@ -134,7 +133,7 @@ public class ChessGame {
             var boardCopy = new ChessBoard(board);
             boardCopy.addPiece(move.getStartPosition(), null);
             boardCopy.addPiece(move.getEndPosition(), king);
-            opposingTeamMoves = getAllMoves(opposingTeam, boardCopy);
+            opposingTeamMoves = getAllMovePositions(opposingTeam, boardCopy);
 
             if (!opposingTeamMoves.contains(kingPos)) {
                 return false;
@@ -161,8 +160,8 @@ public class ChessGame {
         return pieces;
     }
 
-    private Set<ChessPosition> getAllMoves(TeamColor teamColor, ChessBoard board) {
-        Set<ChessPosition> allMoves = new HashSet<>();
+    private Set<ChessMove> getAllMoves(TeamColor teamColor, ChessBoard board) {
+        Set<ChessMove> allMoves = new HashSet<>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 var piecePos = new ChessPosition(i, j);
@@ -172,13 +171,20 @@ public class ChessGame {
                 }
                 if (piece.getTeamColor() == teamColor) {
                     var pieceMoves = piece.pieceMoves(board, piecePos);
-                    for (var move : pieceMoves) {
-                        allMoves.add(move.getEndPosition());
-                    }
+                    allMoves.addAll(pieceMoves);
                 }
             }
         }
         return allMoves;
+    }
+
+    private Set<ChessPosition> getAllMovePositions(TeamColor teamColor, ChessBoard board) {
+        Set<ChessMove> allMoves = getAllMoves(teamColor, board);
+        Set<ChessPosition> allMovePositions = new HashSet<>();
+        for (var move : allMoves) {
+            allMovePositions.add(move.getEndPosition());
+        }
+        return allMovePositions;
     }
 
     /**
