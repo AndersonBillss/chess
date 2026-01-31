@@ -32,7 +32,7 @@ public class ChessMove {
                      SpecialMove specialMove) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-        this.promotionPiece = null;
+        this.promotionPiece = promotionPiece;
         this.specialMove = specialMove;
     }
 
