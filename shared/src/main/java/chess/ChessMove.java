@@ -9,15 +9,31 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
+    public enum SpecialMove {
+        PAWN_MOVE_FORWARD_TWO,
+        EN_PASSANT,
+        CASTLE
+    }
+
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
+    private final SpecialMove specialMove;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
+        this.specialMove = null;
+    }
+
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+                     SpecialMove specialMove) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = null;
+        this.specialMove = specialMove;
     }
 
     @Override
@@ -61,5 +77,9 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    public SpecialMove getSpecialMove() {
+        return specialMove;
     }
 }
