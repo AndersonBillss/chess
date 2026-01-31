@@ -252,6 +252,12 @@ public class ChessPiece {
         if (canOvertake(board, forwardRight, teamColor) && board.getPiece(forwardRight) != null) {
             moves.addAll(pawnPromotion(board, position, forwardRight, teamColor));
         }
+
+        // En Passant
+        var left = position.add(left());
+        var right = position.add(right());
+        
+
         return moves;
     }
 

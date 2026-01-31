@@ -113,7 +113,17 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), movingPiece);
         }
         board.addPiece(move.getStartPosition(), null);
-        movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
+
+        // Reset all pawns that can be taken by en passant
+        TeamColor opposingTeamColor = movingPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        var opposingPawns = findPieces(opposingTeamColor, ChessPiece.PieceType.PAWN);
+        for (var pawnPos : opposingPawns) {
+            movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
+            var pawnPiece = board.getPiece(pawnPos);
+            pawnPiece.setCanBeTakenWithEnPassant(false);
+        }
+
+        // Next player's turn
         teamTurn = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
