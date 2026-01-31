@@ -1,7 +1,7 @@
 package chess;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -84,7 +84,6 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -95,6 +94,37 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+    }
+
+    private ArrayList<ChessPosition> findPieces(TeamColor teamColor, ChessPiece.PieceType type) {
+        ArrayList<ChessPosition> pieces = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition cell = new ChessPosition(i, j);
+                var piece = board.getPiece(cell);
+                if (piece.getPieceType() == type && piece.getTeamColor() == teamColor) {
+                    pieces.add(cell);
+                }
+            }
+        }
+        return pieces;
+    }
+
+    private Set<ChessPosition> getAllMoves(TeamColor teamColor) {
+        Set<ChessPosition> allMoves = new HashSet<>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                var piecePos = new ChessPosition(i, j);
+                var piece = board.getPiece(piecePos);
+                if (piece.getTeamColor() == teamColor) {
+                    var pieceMoves = piece.pieceMoves(board, piecePos);
+                    for (var move : pieceMoves) {
+                        allMoves.add(move.getEndPosition());
+                    }
+                }
+            }
+        }
+        return allMoves;
     }
 
     /**
