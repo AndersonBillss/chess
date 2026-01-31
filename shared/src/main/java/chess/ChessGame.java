@@ -101,6 +101,11 @@ public class ChessGame {
         if (movingPiece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("Wrong turn");
         }
+        // If this is the piece's first move, and it is a pawn moving forward two, it can be taken with en passant
+        if (move.getSpecialMove() == ChessMove.SpecialMove.PAWN_MOVE_FORWARD_TWO &&
+                movingPiece.getTimesMoved() == 0) {
+            movingPiece.setCanBeTakenWithEnPassant(true);
+        }
         if (move.getPromotionPiece() != null) {
             ChessPiece newPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
             board.addPiece(move.getEndPosition(), newPiece);
@@ -108,6 +113,7 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), movingPiece);
         }
         board.addPiece(move.getStartPosition(), null);
+        movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
         teamTurn = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 

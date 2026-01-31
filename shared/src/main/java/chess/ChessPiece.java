@@ -117,6 +117,10 @@ public class ChessPiece {
         this.timesMoved = timesMoved;
     }
 
+    public void setCanBeTakenWithEnPassant(boolean canBeTakenWithEnPassant) {
+        this.canBeTakenWithEnPassant = canBeTakenWithEnPassant;
+    }
+
     public boolean getCanBeTakenWithEnPassant() {
         return canBeTakenWithEnPassant;
     }
