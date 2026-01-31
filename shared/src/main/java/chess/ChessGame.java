@@ -144,6 +144,7 @@ public class ChessGame {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition cell = new ChessPosition(i, j);
                 var piece = board.getPiece(cell);
+                if(piece == null) continue;
                 if (piece.getPieceType() == type && piece.getTeamColor() == teamColor) {
                     pieces.add(cell);
                 }
