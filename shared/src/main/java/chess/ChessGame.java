@@ -16,6 +16,8 @@ public class ChessGame {
     public ChessGame() {
         // White starts first
         teamTurn = TeamColor.WHITE;
+        this.board = new ChessBoard();
+        board.resetBoard();
     }
 
     @Override
