@@ -11,6 +11,8 @@ import java.util.*;
 public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+    private int timesMoved;
+    private boolean canBeTakenWithEnPassant;
 
     @Override
     public boolean equals(Object o) {
@@ -71,11 +73,14 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.timesMoved = 0;
     }
 
     public ChessPiece(ChessPiece piece) {
         this.pieceColor = piece.pieceColor;
         this.type = piece.type;
+        this.timesMoved = piece.timesMoved;
+        this.canBeTakenWithEnPassant = piece.canBeTakenWithEnPassant;
     }
 
     /**
@@ -102,6 +107,18 @@ public class ChessPiece {
      */
     public PieceType getPieceType() {
         return type;
+    }
+
+    public int getTimesMoved() {
+        return timesMoved;
+    }
+
+    public void setTimesMoved(int timesMoved) {
+        this.timesMoved = timesMoved;
+    }
+
+    public boolean getCanBeTakenWithEnPassant() {
+        return canBeTakenWithEnPassant;
     }
 
     /**
