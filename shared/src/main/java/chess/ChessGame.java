@@ -97,7 +97,23 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
+        Set<ChessPosition> opposingTeamPotentialMoves = getAllMoves(opposingTeam);
+        var kingPos = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
+        var king = board.getPiece(kingPos);
+        ArrayList<ChessPosition> potentialKingPositions = new ArrayList<>();
+        potentialKingPositions.add(kingPos);
+        var kingMoves = king.pieceMoves(board, kingPos);
+        for (var move : kingMoves) {
+            potentialKingPositions.add(move.getEndPosition());
+        }
+
+        for (var pos : potentialKingPositions) {
+            if (!opposingTeamPotentialMoves.contains(pos)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private ArrayList<ChessPosition> findPieces(TeamColor teamColor, ChessPiece.PieceType type) {
