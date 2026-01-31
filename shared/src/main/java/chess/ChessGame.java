@@ -98,7 +98,7 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid move");
         }
         var movingPiece = board.getPiece(move.getStartPosition());
-        if(movingPiece.getTeamColor() != getTeamTurn()) {
+        if (movingPiece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("Wrong turn");
         }
         if (move.getPromotionPiece() != null) {
@@ -162,6 +162,10 @@ public class ChessGame {
         return true;
     }
 
+    private ArrayList<ChessPosition> findPieces(TeamColor teamColor) {
+        return findPieces(teamColor, null, this.board);
+    }
+
     private ArrayList<ChessPosition> findPieces(TeamColor teamColor, ChessPiece.PieceType type) {
         return findPieces(teamColor, type, this.board);
     }
@@ -175,7 +179,12 @@ public class ChessGame {
                 if (piece == null) {
                     continue;
                 }
-                if (piece.getPieceType() == type && piece.getTeamColor() == teamColor) {
+                boolean correctTeamColor = piece.getTeamColor() == teamColor;
+                if (type == null && correctTeamColor) {
+                    pieces.add(cell);
+                    continue;
+                }
+                if (piece.getPieceType() == type && correctTeamColor) {
                     pieces.add(cell);
                 }
             }
@@ -218,7 +227,20 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (teamColor != this.teamTurn) {
+            return false;
+        }
+        var pieces = findPieces(teamColor);
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        for (var piece : pieces) {
+            moves.addAll(validMoves(piece));
+        }
+
+        if (moves.isEmpty()) {
+            var check = isInCheck(teamColor);
+            return !check;
+        }
+        return false;
     }
 
     /**
