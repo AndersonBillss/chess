@@ -120,20 +120,22 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         TeamColor opposingTeam = teamColor == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
         var kingPos = findPieces(teamColor, ChessPiece.PieceType.KING).getFirst();
-        var king = board.getPiece(kingPos);
 
         Set<ChessPosition> opposingTeamMoves = getAllMovePositions(opposingTeam, board);
         if (!opposingTeamMoves.contains(kingPos)) {
             return false;
         }
 
-        var kingMoves = king.pieceMoves(board, kingPos);
-        for (var move : kingMoves) {
+        var blackMoves = getAllMoves(teamColor, board);
+        for (var move : blackMoves) {
             // Make the move on a copy of the board
             var boardCopy = new ChessBoard(board);
+            var movingPiece = boardCopy.getPiece(move.getStartPosition());
             boardCopy.addPiece(move.getStartPosition(), null);
-            boardCopy.addPiece(move.getEndPosition(), king);
+            boardCopy.addPiece(move.getEndPosition(), movingPiece);
             opposingTeamMoves = getAllMovePositions(opposingTeam, boardCopy);
+
+            kingPos = findPieces(teamColor, ChessPiece.PieceType.KING, boardCopy).getFirst();
 
             if (!opposingTeamMoves.contains(kingPos)) {
                 return false;
@@ -144,6 +146,10 @@ public class ChessGame {
     }
 
     private ArrayList<ChessPosition> findPieces(TeamColor teamColor, ChessPiece.PieceType type) {
+        return findPieces(teamColor, type, this.board);
+    }
+
+    private ArrayList<ChessPosition> findPieces(TeamColor teamColor, ChessPiece.PieceType type, ChessBoard board) {
         ArrayList<ChessPosition> pieces = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
