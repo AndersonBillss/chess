@@ -257,7 +257,7 @@ public class ChessPiece {
         var leftCell = position.add(left());
         if (board.inBounds(leftCell)) {
             var leftPiece = board.getPiece(leftCell);
-            if (leftPiece.getCanBeTakenWithEnPassant()) {
+            if (leftPiece != null && leftPiece.getCanBeTakenWithEnPassant()) {
                 ChessMove enPassantMove = new ChessMove(
                         position,
                         forwardLeft,
@@ -269,7 +269,7 @@ public class ChessPiece {
         var rightCell = position.add(right());
         if (board.inBounds(rightCell)) {
             var rightPiece = board.getPiece(rightCell);
-            if (rightPiece.getCanBeTakenWithEnPassant()) {
+            if (rightPiece != null && rightPiece.getCanBeTakenWithEnPassant()) {
                 ChessMove enPassantMove = new ChessMove(
                         position,
                         forwardRight,
