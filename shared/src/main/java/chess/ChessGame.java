@@ -64,7 +64,21 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        var piece = board.getPiece(startPosition);
+        var opposingTeam = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            Collection<ChessMove> kingMoves = piece.pieceMoves(board, startPosition);
+            ArrayList<ChessMove> validKingMoves = new ArrayList<>();
+            var opposingTeamMoves = getAllMoves(opposingTeam);
+            for (var move : kingMoves) {
+                if (!opposingTeamMoves.contains(move.getEndPosition())) {
+                    validKingMoves.add(move);
+                }
+            }
+            return validKingMoves;
+        } else {
+            return piece.pieceMoves(board, startPosition);
+        }
     }
 
     /**
