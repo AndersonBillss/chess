@@ -237,7 +237,7 @@ public class ChessPiece {
         ChessPosition forwardTwo = position.add(forward().mul(2));
         var canMoveTwo = !board.inBounds(backwardTwo) && board.inBounds(backwardOne);
         if (canMoveTwo && board.getPiece(forwardTwo) == null && board.getPiece(forwardOne) == null) {
-            moves.add(new ChessMove(position, forwardTwo, null));
+            moves.add(new ChessMove(position, forwardTwo, null, ChessMove.SpecialMove.PAWN_MOVE_FORWARD_TWO));
         }
 
         var forwardLeft = position.add(forward().add(left()));
