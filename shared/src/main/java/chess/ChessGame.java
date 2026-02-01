@@ -79,13 +79,13 @@ public class ChessGame {
                 result.add(move);
             }
         }
-        pieceMoves.addAll(castlingMoves(startPosition));
+        result.addAll(castlingMoves(startPosition));
         return result;
     }
 
-    private Collection<ChessMove> castlingMoves(ChessPosition position) {
+    private Collection<ChessMove> castlingMoves(ChessPosition kingPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
-        var king = board.getPiece(position);
+        var king = board.getPiece(kingPosition);
         if (king.getPieceType() != ChessPiece.PieceType.KING) {
             return moves;
         }
@@ -93,47 +93,46 @@ public class ChessGame {
             return moves;
         }
 
-        var leftRookPos = position.add(new ChessPosition(0, 4));
+        var row = kingPosition.getRow();
+        var leftRookPos = new ChessPosition(row, 1);
         var leftRook = board.getPiece(leftRookPos);
         // The two spaces to the left should be clear
         ChessPosition[] clearSpacesLeft = new ChessPosition[]{
-                position.add(new ChessPosition(0, -1)),
-                position.add(new ChessPosition(0, -2)),
-                position.add(new ChessPosition(0, -3)),
+                new ChessPosition(row, 2),
+                new ChessPosition(row, 3),
+                new ChessPosition(row, 4),
         };
         ChessPosition[] positionsNotInCheckLeft = new ChessPosition[]{
-                position,
-                position.add(new ChessPosition(0, -1)),
-                position.add(new ChessPosition(0, -2)),
-                position.add(new ChessPosition(0, -3)),
-                leftRookPos,
+                kingPosition,
+                new ChessPosition(row, 2),
+                new ChessPosition(row, 3),
+                new ChessPosition(row, 4),
         };
         if (checkCastleRules(clearSpacesLeft, positionsNotInCheckLeft, leftRook)) {
-            moves.add(new ChessMove(position, position.add(new ChessPosition(0, -2)), null));
+            moves.add(new ChessMove(kingPosition, kingPosition.add(new ChessPosition(0, -2)), null));
         }
 
-        var rightRookPos = position.add(new ChessPosition(0, 4));
-        var rightRook = board.getPiece(leftRookPos);
+        var rightRookPos = new ChessPosition(row, 8);
+        var rightRook = board.getPiece(rightRookPos);
         // The two spaces to the left should be clear
         ChessPosition[] clearSpacesRight = new ChessPosition[]{
-                position.add(new ChessPosition(0, 1)),
-                position.add(new ChessPosition(0, 2)),
+                new ChessPosition(row, 6),
+                new ChessPosition(row, 7),
         };
         ChessPosition[] positionsNotInCheckRight = new ChessPosition[]{
-                position,
-                position.add(new ChessPosition(0, 1)),
-                position.add(new ChessPosition(0, 2)),
-                rightRookPos,
+                kingPosition,
+                new ChessPosition(row, 6),
+                new ChessPosition(row, 7),
         };
         if (checkCastleRules(clearSpacesRight, positionsNotInCheckRight, rightRook)) {
-            moves.add(new ChessMove(position, position.add(new ChessPosition(0, 2)), null));
+            moves.add(new ChessMove(kingPosition, kingPosition.add(new ChessPosition(0, 2)), null));
         }
 
         return moves;
     }
 
     private boolean checkCastleRules(ChessPosition[] clearSpaces, ChessPosition[] positionsNotInCheck, ChessPiece piece) {
-        if (piece.getPieceType() != ChessPiece.PieceType.ROOK) {
+        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.ROOK) {
             return false;
         }
         if (piece.getTimesMoved() > 0) {
@@ -182,6 +181,8 @@ public class ChessGame {
         if (movingPiece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("Wrong turn");
         }
+        movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
+
         // Reset all pawns that can be taken by en passant
         var opposingPawns = findPieces(movingPiece.getTeamColor(), ChessPiece.PieceType.PAWN);
         for (var pawnPos : opposingPawns) {
@@ -190,17 +191,43 @@ public class ChessGame {
             pawnPiece.setCanBeTakenWithEnPassant(false);
         }
 
-        // If the piece is a pawn moving forward two, it can be taken with en passant
+        // If a pawn moves forward two, it can be taken with en passant
         boolean pawnMoveForwardTwo = movingPiece.getPieceType() == ChessPiece.PieceType.PAWN
                 && move.getEndPosition().equals(move.getStartPosition().add(movingPiece.forward().mul(2)));
         if (pawnMoveForwardTwo) {
             movingPiece.setCanBeTakenWithEnPassant(true);
         }
+
+        // If a pawn is moving diagonally towards a null cell, it is an en passant move
         boolean isEnPassantMove = movingPiece.getPieceType() == ChessPiece.PieceType.PAWN
                 && move.getEndPosition().getRow() != move.getStartPosition().getRow()
                 && move.getEndPosition().getColumn() != move.getStartPosition().getColumn()
                 && board.getPiece(move.getEndPosition()) == null;
-        if (isEnPassantMove) {
+
+        // If the king moves more than one column, it is a castling move
+        boolean isCastlingMoveRight = movingPiece.getPieceType() == ChessPiece.PieceType.KING
+                && move.getEndPosition().getColumn() - move.getStartPosition().getColumn() > 1;
+
+        boolean isCastlingMoveLeft = movingPiece.getPieceType() == ChessPiece.PieceType.KING
+                && move.getEndPosition().getColumn() - move.getStartPosition().getColumn() < -1;
+
+        if (isCastlingMoveLeft) {
+            var row = move.getEndPosition().getRow();
+            var rookPiecePos = new ChessPosition(row, 1);
+            var rookPiece = board.getPiece(rookPiecePos);
+            board.addPiece(rookPiecePos, null);
+            var newRookPos = new ChessPosition(row, move.getEndPosition().getColumn() + 1);
+            board.addPiece(newRookPos, rookPiece);
+            board.addPiece(move.getEndPosition(), movingPiece);
+        } else if (isCastlingMoveRight) {
+            var row = move.getEndPosition().getRow();
+            var rookPiecePos = new ChessPosition(row, 8);
+            var rookPiece = board.getPiece(rookPiecePos);
+            board.addPiece(rookPiecePos, null);
+            var newRookPos = new ChessPosition(row, move.getEndPosition().getColumn() - 1);
+            board.addPiece(newRookPos, rookPiece);
+            board.addPiece(move.getEndPosition(), movingPiece);
+        } else if (isEnPassantMove) {
             board.addPiece(move.getEndPosition(), movingPiece);
             board.addPiece(move.getEndPosition().add(movingPiece.backward()), null);
         } else if (move.getPromotionPiece() != null) {
