@@ -30,13 +30,7 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        final Map<PieceType, String> pieceToString = Map.of(
-                PieceType.KING, "k",
-                PieceType.QUEEN, "q",
-                PieceType.BISHOP, "b",
-                PieceType.KNIGHT, "n",
-                PieceType.ROOK, "r",
-                PieceType.PAWN, "p");
+        final Map<PieceType, String> pieceToString = Map.of(PieceType.KING, "k", PieceType.QUEEN, "q", PieceType.BISHOP, "b", PieceType.KNIGHT, "n", PieceType.ROOK, "r", PieceType.PAWN, "p");
 
         String pieceString = pieceToString.get(type);
         if (pieceColor == ChessGame.TeamColor.WHITE) {
@@ -45,26 +39,26 @@ public class ChessPiece {
         return pieceString;
     }
 
-    private ChessPosition forward() {
+    public ChessPosition forward() {
         if (pieceColor == ChessGame.TeamColor.BLACK) {
             return new ChessPosition(-1, 0);
         }
         return new ChessPosition(1, 0);
     }
 
-    private ChessPosition backward() {
+    public ChessPosition backward() {
         ChessPosition forward = forward();
         return new ChessPosition(-forward.getRow(), forward.getColumn());
     }
 
-    private ChessPosition left() {
+    public ChessPosition left() {
         if (pieceColor == ChessGame.TeamColor.BLACK) {
-            return new ChessPosition(0, -1);
+            return new ChessPosition(0, 1);
         }
-        return new ChessPosition(0, 1);
+        return new ChessPosition(0, -1);
     }
 
-    private ChessPosition right() {
+    public ChessPosition right() {
         ChessPosition left = left();
         return new ChessPosition(left.getRow(), -left.getColumn());
     }
@@ -87,12 +81,7 @@ public class ChessPiece {
      * The various different chess piece options
      */
     public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
+        KING, QUEEN, BISHOP, KNIGHT, ROOK, PAWN
     }
 
     /**
@@ -241,7 +230,7 @@ public class ChessPiece {
         ChessPosition forwardTwo = position.add(forward().mul(2));
         var canMoveTwo = !board.inBounds(backwardTwo) && board.inBounds(backwardOne);
         if (canMoveTwo && board.getPiece(forwardTwo) == null && board.getPiece(forwardOne) == null) {
-            moves.add(new ChessMove(position, forwardTwo, null, ChessMove.SpecialMove.PAWN_MOVE_FORWARD_TWO));
+            moves.add(new ChessMove(position, forwardTwo, null));
         }
 
         var forwardLeft = position.add(forward().add(left()));
@@ -257,24 +246,16 @@ public class ChessPiece {
         var leftCell = position.add(left());
         if (board.inBounds(leftCell)) {
             var leftPiece = board.getPiece(leftCell);
-            if (leftPiece != null && leftPiece.getCanBeTakenWithEnPassant()) {
-                ChessMove enPassantMove = new ChessMove(
-                        position,
-                        forwardLeft,
-                        null,
-                        ChessMove.SpecialMove.EN_PASSANT);
+            if (leftPiece != null && leftPiece.getCanBeTakenWithEnPassant() && leftPiece.getTeamColor() != teamColor) {
+                ChessMove enPassantMove = new ChessMove(position, forwardLeft, null);
                 moves.add(enPassantMove);
             }
         }
         var rightCell = position.add(right());
         if (board.inBounds(rightCell)) {
             var rightPiece = board.getPiece(rightCell);
-            if (rightPiece != null && rightPiece.getCanBeTakenWithEnPassant()) {
-                ChessMove enPassantMove = new ChessMove(
-                        position,
-                        forwardRight,
-                        null,
-                        ChessMove.SpecialMove.EN_PASSANT);
+            if (rightPiece != null && rightPiece.getCanBeTakenWithEnPassant() && rightPiece.getTeamColor() != teamColor) {
+                ChessMove enPassantMove = new ChessMove(position, forwardRight, null);
                 moves.add(enPassantMove);
             }
         }
@@ -283,8 +264,7 @@ public class ChessPiece {
 
     private Collection<ChessMove> pawnPromotion(ChessBoard board, ChessPosition oldPosition, ChessPosition newPosition, ChessGame.TeamColor teamColor) {
         Collection<ChessMove> moves = new ArrayList<>();
-        var forwardTwo = newPosition.add(forward().mul(2));
-        var canPromote = !board.inBounds(forwardTwo);
+        var canPromote = !board.inBounds(newPosition.add(forward()));
         if (canPromote) {
             moves.add(new ChessMove(oldPosition, newPosition, PieceType.QUEEN));
             moves.add(new ChessMove(oldPosition, newPosition, PieceType.BISHOP));
@@ -307,10 +287,7 @@ public class ChessPiece {
         return piece.getTeamColor() != teamColor;
     }
 
-    private Collection<ChessMove> moveLine(
-            ChessBoard board,
-            ChessPosition position,
-            ChessGame.TeamColor teamColor, ChessPosition direction) {
+    private Collection<ChessMove> moveLine(ChessBoard board, ChessPosition position, ChessGame.TeamColor teamColor, ChessPosition direction) {
         Collection<ChessMove> moves = new ArrayList<>();
 
         var newMove = position.add(direction);

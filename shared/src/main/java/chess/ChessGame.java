@@ -1,5 +1,6 @@
 package chess;
 
+import java.io.Console;
 import java.util.*;
 
 /**
@@ -67,13 +68,14 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var piece = board.getPiece(startPosition);
         var pieceMoves = piece.pieceMoves(board, startPosition);
+        var teamColor = piece.getTeamColor();
         ArrayList<ChessMove> result = new ArrayList<>();
         for (var move : pieceMoves) {
             var boardCopy = new ChessBoard(board);
             var movingPiece = boardCopy.getPiece(move.getStartPosition());
             boardCopy.addPiece(move.getStartPosition(), null);
             boardCopy.addPiece(move.getEndPosition(), movingPiece);
-            if (!isInCheck(piece.getTeamColor(), boardCopy)) {
+            if (!isInCheck(teamColor, boardCopy)) {
                 result.add(move);
             }
         }
@@ -101,27 +103,34 @@ public class ChessGame {
         if (movingPiece.getTeamColor() != getTeamTurn()) {
             throw new InvalidMoveException("Wrong turn");
         }
-        // If this is the piece's first move, and it is a pawn moving forward two, it can be taken with en passant
-        if (move.getSpecialMove() == ChessMove.SpecialMove.PAWN_MOVE_FORWARD_TWO &&
-                movingPiece.getTimesMoved() == 0) {
+        // Reset all pawns that can be taken by en passant
+        var opposingPawns = findPieces(movingPiece.getTeamColor(), ChessPiece.PieceType.PAWN);
+        for (var pawnPos : opposingPawns) {
+            movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
+            var pawnPiece = board.getPiece(pawnPos);
+            pawnPiece.setCanBeTakenWithEnPassant(false);
+        }
+
+        // If the piece is a pawn moving forward two, it can be taken with en passant
+        boolean pawnMoveForwardTwo = movingPiece.getPieceType() == ChessPiece.PieceType.PAWN
+                && move.getEndPosition().equals(move.getStartPosition().add(movingPiece.forward().mul(2)));
+        if (pawnMoveForwardTwo) {
             movingPiece.setCanBeTakenWithEnPassant(true);
         }
-        if (move.getPromotionPiece() != null) {
+        boolean isEnPassantMove = movingPiece.getPieceType() == ChessPiece.PieceType.PAWN
+                && move.getEndPosition().getRow() != move.getStartPosition().getRow()
+                && move.getEndPosition().getColumn() != move.getStartPosition().getColumn()
+                && board.getPiece(move.getEndPosition()) == null;
+        if (isEnPassantMove) {
+            board.addPiece(move.getEndPosition(), movingPiece);
+            board.addPiece(move.getEndPosition().add(movingPiece.backward()), null);
+        } else if (move.getPromotionPiece() != null) {
             ChessPiece newPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
             board.addPiece(move.getEndPosition(), newPiece);
         } else {
             board.addPiece(move.getEndPosition(), movingPiece);
         }
         board.addPiece(move.getStartPosition(), null);
-
-        // Reset all pawns that can be taken by en passant
-        TeamColor opposingTeamColor = movingPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
-        var opposingPawns = findPieces(opposingTeamColor, ChessPiece.PieceType.PAWN);
-        for (var pawnPos : opposingPawns) {
-            movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
-            var pawnPiece = board.getPiece(pawnPos);
-            pawnPiece.setCanBeTakenWithEnPassant(false);
-        }
 
         // Next player's turn
         teamTurn = teamTurn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
