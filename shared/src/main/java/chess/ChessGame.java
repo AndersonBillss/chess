@@ -79,7 +79,86 @@ public class ChessGame {
                 result.add(move);
             }
         }
+        pieceMoves.addAll(castlingMoves(startPosition));
         return result;
+    }
+
+    private Collection<ChessMove> castlingMoves(ChessPosition position) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        var king = board.getPiece(position);
+        if (king.getPieceType() != ChessPiece.PieceType.KING) {
+            return moves;
+        }
+        if (king.getTimesMoved() > 0) {
+            return moves;
+        }
+
+        var leftRookPos = position.add(new ChessPosition(0, 4));
+        var leftRook = board.getPiece(leftRookPos);
+        // The two spaces to the left should be clear
+        ChessPosition[] clearSpacesLeft = new ChessPosition[]{
+                position.add(new ChessPosition(0, -1)),
+                position.add(new ChessPosition(0, -2)),
+                position.add(new ChessPosition(0, -3)),
+        };
+        ChessPosition[] positionsNotInCheckLeft = new ChessPosition[]{
+                position,
+                position.add(new ChessPosition(0, -1)),
+                position.add(new ChessPosition(0, -2)),
+                position.add(new ChessPosition(0, -3)),
+                leftRookPos,
+        };
+        if (checkCastleRules(clearSpacesLeft, positionsNotInCheckLeft, leftRook)) {
+            moves.add(new ChessMove(position, position.add(new ChessPosition(0, -2)), null));
+        }
+
+        var rightRookPos = position.add(new ChessPosition(0, 4));
+        var rightRook = board.getPiece(leftRookPos);
+        // The two spaces to the left should be clear
+        ChessPosition[] clearSpacesRight = new ChessPosition[]{
+                position.add(new ChessPosition(0, 1)),
+                position.add(new ChessPosition(0, 2)),
+        };
+        ChessPosition[] positionsNotInCheckRight = new ChessPosition[]{
+                position,
+                position.add(new ChessPosition(0, 1)),
+                position.add(new ChessPosition(0, 2)),
+                rightRookPos,
+        };
+        if (checkCastleRules(clearSpacesRight, positionsNotInCheckRight, rightRook)) {
+            moves.add(new ChessMove(position, position.add(new ChessPosition(0, 2)), null));
+        }
+
+        return moves;
+    }
+
+    private boolean checkCastleRules(ChessPosition[] clearSpaces, ChessPosition[] positionsNotInCheck, ChessPiece piece) {
+        if (piece.getPieceType() != ChessPiece.PieceType.ROOK) {
+            return false;
+        }
+        if (piece.getTimesMoved() > 0) {
+            return false;
+        }
+        if (!isClear(clearSpaces)) {
+            return false;
+        }
+        var opposingTeam = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        var allOpposingMoves = getAllMovePositions(opposingTeam, board);
+        for (var pos : positionsNotInCheck) {
+            if (allOpposingMoves.contains(pos)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isClear(ChessPosition[] positions) {
+        for (var pos : positions) {
+            if (board.getPiece(pos) != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
