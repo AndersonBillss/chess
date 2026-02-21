@@ -1,6 +1,7 @@
 package server;
 
 import io.javalin.*;
+import service.AuthService;
 
 public class Server {
 
