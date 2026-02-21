@@ -4,7 +4,7 @@ import model.UserData;
 
 import java.util.HashMap;
 
-public class MemoryAuthDAO {
+public class MemoryAuthDAO implements AuthDAO {
     private int tokenCount = 0;
     private HashMap<String, String> authSessions;
 
