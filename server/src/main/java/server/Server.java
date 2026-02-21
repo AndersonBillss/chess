@@ -1,8 +1,7 @@
 package server;
 
-import handlers.AuthHandler;
+import handlers.UserHandler;
 import io.javalin.*;
-import service.AuthService;
 
 public class Server {
 
@@ -11,10 +10,10 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        var authHandler = new AuthHandler();
+        var userHandler = new UserHandler();
         // Register your endpoints and exception handlers here.
         javalin
-                .post("/user", authHandler::register);
+                .post("/user", userHandler::register);
     }
 
     public int run(int desiredPort) {

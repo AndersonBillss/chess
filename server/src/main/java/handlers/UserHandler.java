@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import dto.RegisterRequest;
 import dto.RegisterResult;
 import io.javalin.http.Context;
-import service.AuthService;
+import service.UserService;
 
-public class AuthHandler {
-    private final AuthService service;
+public class UserHandler {
+    private final UserService service;
 
-    public AuthHandler() {
-        this.service = new AuthService();
+    public UserHandler() {
+        this.service = new UserService();
     }
 
     public void register(Context ctx) {
