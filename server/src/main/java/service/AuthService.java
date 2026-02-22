@@ -17,10 +17,10 @@ public class AuthService {
     }
 
     public LoginResult login(LoginRequest req, String authToken)
-            throws NotFoundException, DataAccessException, UnauthorizedException {
+            throws DataAccessException, UnauthorizedException {
         var existingUser = userDAO.getUser(req.username());
         if (existingUser == null) {
-            throw new NotFoundException();
+            throw new UnauthorizedException();
         }
         var existingSession = authDao.getAuth(authToken);
         if (existingSession != null) {
