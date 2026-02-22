@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.*;
 import dto.CreateGameRequest;
 import dto.CreateGameResult;
+import dto.ListGamesResult;
 import model.GameData;
 
 public class GameService {
@@ -14,6 +15,14 @@ public class GameService {
     public GameService() {
         this.authDao = new MemoryAuthDAO();
         this.gameDAO = new MemoryGameDAO();
+    }
+
+    public ListGamesResult listGames(String authToken)
+            throws DataAccessException, UnauthorizedException {
+        if (authDao.getAuth(authToken) == null) {
+            throw new UnauthorizedException();
+        }
+        return new ListGamesResult(gameDAO.getGames());
     }
 
     public CreateGameResult createGame(CreateGameRequest req, String authToken)
