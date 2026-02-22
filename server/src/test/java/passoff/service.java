@@ -135,4 +135,24 @@ public class service {
         CreateGameRequest req = new CreateGameRequest(null);
         assertThrows(BadRequestException.class, () -> gameService.createGame(req, authToken));
     }
+
+    @Test
+    void ListGameSuccessTest()
+            throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest registerReq = new RegisterRequest("John", "123", "test@test");
+        var authToken = userService.register(registerReq).authToken();
+
+        gameService.createGame(new CreateGameRequest("TestGame1"), authToken);
+        gameService.createGame(new CreateGameRequest("TestGame2"), authToken);
+        gameService.createGame(new CreateGameRequest("TestGame3"), authToken);
+        gameService.createGame(new CreateGameRequest("TestGame4"), authToken);
+
+        var allGames = gameService.listGames(authToken);
+        assertEquals(4, allGames.games().size());
+    }
+
+    @Test
+    void ListGamesUnauthorizedTest() {
+        assertThrows(UnauthorizedException.class, () -> gameService.listGames("Invalid Token"));
+    }
 }
