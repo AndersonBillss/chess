@@ -1,9 +1,7 @@
 package passoff;
 
 import dataaccess.*;
-import dto.CreateGameRequest;
-import dto.LoginRequest;
-import dto.RegisterRequest;
+import dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
@@ -137,7 +135,7 @@ public class service {
     }
 
     @Test
-    void ListGameSuccessTest()
+    void listGameSuccessTest()
             throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
         RegisterRequest registerReq = new RegisterRequest("John", "123", "test@test");
         var authToken = userService.register(registerReq).authToken();
@@ -152,7 +150,36 @@ public class service {
     }
 
     @Test
-    void ListGamesUnauthorizedTest() {
+    void listGamesUnauthorizedTest() {
         assertThrows(UnauthorizedException.class, () -> gameService.listGames("Invalid Token"));
+    }
+
+    @Test
+    void joinGameSuccessTest()
+            throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest registerReq = new RegisterRequest("John", "123", "test@test");
+        var authToken = userService.register(registerReq).authToken();
+        var game = gameService.createGame(new CreateGameRequest("TestGame1"), authToken);
+
+        JoinGameRequest req = new JoinGameRequest("WHITE", game.gameID());
+        gameService.joinGame(req, authToken);
+
+        var resultGame = gameDao.getGame(game.gameID());
+        assertEquals("John", resultGame.whiteUsername());
+    }
+
+    @Test
+    void joinGameExistingPlayerTest()
+            throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest registerReq1 = new RegisterRequest("John", "123", "test@test");
+        var p1AuthToken = userService.register(registerReq1).authToken();
+        RegisterRequest registerReq2 = new RegisterRequest("Bob", "123", "test@test");
+        var p2AuthToken = userService.register(registerReq2).authToken();
+        var game = gameService.createGame(new CreateGameRequest("TestGame1"), p1AuthToken);
+
+        JoinGameRequest req1 = new JoinGameRequest("WHITE", game.gameID());
+        gameService.joinGame(req1, p1AuthToken);
+        JoinGameRequest req2 = new JoinGameRequest("WHITE", game.gameID());
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(req2, p2AuthToken));
     }
 }
