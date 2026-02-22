@@ -5,6 +5,8 @@ import dto.LoginRequest;
 import dto.LoginResult;
 import model.AuthData;
 
+import java.util.Objects;
+
 public class AuthService {
     private final AuthDAO authDao;
     private final UserDAO userDAO;
@@ -14,13 +16,17 @@ public class AuthService {
         this.userDAO = userDao;
     }
 
-    public LoginResult login(LoginRequest req)
+    public LoginResult login(LoginRequest req, String authToken)
             throws NotFoundException, DataAccessException, UnauthorizedException {
         var existingUser = userDAO.getUser(req.username());
         if (existingUser == null) {
             throw new NotFoundException();
         }
-        if (existingUser.password() != req.password()) {
+        var existingSession = authDao.getAuth(authToken);
+        if (existingSession != null) {
+            throw new UnauthorizedException();
+        }
+        if (!Objects.equals(existingUser.password(), req.password())) {
             throw new UnauthorizedException();
         }
         String token = ServiceUtils.generateToken();

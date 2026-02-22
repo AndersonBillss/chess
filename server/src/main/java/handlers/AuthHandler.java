@@ -19,7 +19,8 @@ public class AuthHandler {
     public void login(Context ctx) throws NotFoundException, DataAccessException, UnauthorizedException {
         var gson = new Gson();
         LoginRequest req = gson.fromJson(ctx.body(), LoginRequest.class);
-        LoginResult res = service.login(req);
+        var authToken = ctx.header("Authorization");
+        LoginResult res = service.login(req, authToken);
         ctx.json(gson.toJson(res));
     }
 

@@ -8,6 +8,8 @@ import dto.JoinGameRequest;
 import dto.ListGamesResult;
 import model.GameData;
 
+import java.util.Objects;
+
 public class GameService {
     private final AuthDAO authDao;
     private final GameDAO gameDAO;
@@ -56,7 +58,7 @@ public class GameService {
             throw new NotFoundException();
         }
 
-        String existingUser = req.playerColor() == "BLACK" ?
+        String existingUser = Objects.equals(req.playerColor(), "BLACK") ?
                 data.blackUsername() :
                 data.whiteUsername();
 
@@ -65,7 +67,7 @@ public class GameService {
         }
 
         GameData newGame;
-        if (req.playerColor() == "BLACK") {
+        if (Objects.equals(req.playerColor(), "BLACK")) {
             newGame = new GameData(
                     data.gameID(),
                     data.whiteUsername(),

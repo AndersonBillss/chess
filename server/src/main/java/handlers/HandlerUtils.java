@@ -20,6 +20,9 @@ public class HandlerUtils {
             } catch (DataAccessException e) {
                 var gson = new Gson();
                 ctx.status(500).json(gson.toJson(new ErrorResult("Error: could not connect to database")));
+            } catch (Exception e) {
+                var gson = new Gson();
+                ctx.status(500).json(gson.toJson(new ErrorResult(e.getMessage())));
             }
         };
     }

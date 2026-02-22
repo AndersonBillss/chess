@@ -79,7 +79,7 @@ public class service {
         authService.logout(res.authToken());
 
         LoginRequest loginRequest = new LoginRequest("John", "123");
-        var loginResponse = authService.login(loginRequest);
+        var loginResponse = authService.login(loginRequest, null);
 
         var session = authDao.getAuth(loginResponse.authToken());
         assertEquals("John", session.username());
@@ -94,7 +94,7 @@ public class service {
         authService.logout(res.authToken());
 
         LoginRequest loginRequest = new LoginRequest("John", "1234");
-        assertThrows(UnauthorizedException.class, () -> authService.login(loginRequest));
+        assertThrows(UnauthorizedException.class, () -> authService.login(loginRequest, null));
     }
 
     @Test
@@ -106,6 +106,6 @@ public class service {
         authService.logout(res.authToken());
 
         LoginRequest loginRequest = new LoginRequest("Joe", "123");
-        assertThrows(NotFoundException.class, () -> authService.login(loginRequest));
+        assertThrows(NotFoundException.class, () -> authService.login(loginRequest, null));
     }
 }
