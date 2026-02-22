@@ -18,6 +18,7 @@ public class GameService {
     public GameService(AuthDAO authDao, GameDAO gameDao) {
         this.authDao = authDao;
         this.gameDAO = gameDao;
+        this.gameId = 1;
     }
 
     public ListGamesResult listGames(String authToken)
