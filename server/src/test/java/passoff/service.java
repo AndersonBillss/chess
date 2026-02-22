@@ -1,7 +1,6 @@
 package passoff;
 
 import dataaccess.*;
-import dto.LoginRequest;
 import dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,5 +49,24 @@ public class service {
         RegisterRequest req = new RegisterRequest("John", "Doe", "test@test");
         userService.register(req);
         assertThrows(AlreadyTakenException.class, () -> userService.register(req));
+    }
+
+    @Test
+    void logoutSuccessTest() throws AlreadyTakenException, DataAccessException, NotFoundException {
+        RegisterRequest req = new RegisterRequest("John", "Doe", "test@test");
+        var res = userService.register(req);
+
+        authService.logout(res.authToken());
+        var auth = authDao.getAuth(res.authToken());
+        assertNull(auth);
+    }
+
+    @Test
+    void logoutTwiceTest() throws AlreadyTakenException, DataAccessException, NotFoundException {
+        RegisterRequest req = new RegisterRequest("John", "Doe", "test@test");
+        var res = userService.register(req);
+
+        authService.logout(res.authToken());
+        assertThrows(NotFoundException.class, () -> authService.logout(res.authToken()));
     }
 }

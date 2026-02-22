@@ -3,7 +3,6 @@ package service;
 import dataaccess.*;
 import dto.LoginRequest;
 import dto.LoginResult;
-import dto.LogoutRequest;
 import model.AuthData;
 
 public class AuthService {
@@ -25,11 +24,11 @@ public class AuthService {
         return new LoginResult(token, req.username());
     }
 
-    public void logout(LogoutRequest req) throws NotFoundException, DataAccessException {
-        var existingSession = authDao.getAuth(req.authToken());
+    public void logout(String authToken) throws NotFoundException, DataAccessException {
+        var existingSession = authDao.getAuth(authToken);
         if (existingSession == null) {
             throw new NotFoundException("Error: user not found");
         }
-        authDao.deleteAuth(req.authToken());
+        authDao.deleteAuth(authToken);
     }
 }
