@@ -12,8 +12,8 @@ import service.NotFoundException;
 public class AuthHandler {
     private final AuthService service;
 
-    public AuthHandler() {
-        this.service = new AuthService();
+    public AuthHandler(AuthService service) {
+        this.service = service;
     }
 
     public void login(Context ctx) throws NotFoundException, DataAccessException {

@@ -15,9 +15,9 @@ public class GameService {
     private final GameDAO gameDAO;
     private int gameId;
 
-    public GameService() {
-        this.authDao = new MemoryAuthDAO();
-        this.gameDAO = new MemoryGameDAO();
+    public GameService(AuthDAO authDao, GameDAO gameDao) {
+        this.authDao = authDao;
+        this.gameDAO = gameDao;
     }
 
     public ListGamesResult listGames(String authToken)

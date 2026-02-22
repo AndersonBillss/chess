@@ -10,9 +10,9 @@ public class AuthService {
     private final AuthDAO authDao;
     private final UserDAO userDAO;
 
-    public AuthService() {
-        this.authDao = new MemoryAuthDAO();
-        this.userDAO = new MemoryUserDAO();
+    public AuthService(AuthDAO authDao, UserDAO userDao) {
+        this.authDao = authDao;
+        this.userDAO = userDao;
     }
 
     public LoginResult login(LoginRequest req) throws NotFoundException, DataAccessException {

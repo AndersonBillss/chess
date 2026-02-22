@@ -12,8 +12,8 @@ import service.UnauthorizedException;
 public class GameHandler {
     private final GameService service;
 
-    public GameHandler() {
-        service = new GameService();
+    public GameHandler(GameService service) {
+        this.service = service;
     }
 
     public void listGames(Context ctx)

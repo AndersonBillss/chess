@@ -11,8 +11,8 @@ import service.UserService;
 public class UserHandler {
     private final UserService service;
 
-    public UserHandler() {
-        this.service = new UserService();
+    public UserHandler(UserService service) {
+        this.service = service;
     }
 
     public void register(Context ctx) throws AlreadyTakenException, DataAccessException {

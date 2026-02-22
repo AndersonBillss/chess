@@ -10,9 +10,9 @@ public class UserService {
     private final AuthDAO authDao;
     private final UserDAO userDAO;
 
-    public UserService() {
-        this.authDao = new MemoryAuthDAO();
-        this.userDAO = new MemoryUserDAO();
+    public UserService(AuthDAO authDao, UserDAO userDao) {
+        this.authDao = authDao;
+        this.userDAO = userDao;
     }
 
     public RegisterResult register(RegisterRequest req) throws AlreadyTakenException, DataAccessException {
