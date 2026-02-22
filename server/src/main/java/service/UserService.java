@@ -19,7 +19,7 @@ public class UserService {
         UserData newUser = new UserData(req.username(), req.password(), req.email());
         var existingUser = userDAO.getUser(req.username());
         if (existingUser != null) {
-            throw new AlreadyTakenException("Error: username already taken");
+            throw new AlreadyTakenException();
         }
         userDAO.createUser(newUser);
         String token = ServiceUtils.generateToken();

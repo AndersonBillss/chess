@@ -1,6 +1,10 @@
 package service;
 
 public class AlreadyTakenException extends ServiceException {
+    public AlreadyTakenException() {
+        super("Error: already taken");
+    }
+
     public AlreadyTakenException(String message) {
         super(message);
     }
@@ -11,6 +15,6 @@ public class AlreadyTakenException extends ServiceException {
 
     @Override
     public int getStatus() {
-        return 409;
+        return 403;
     }
 }
