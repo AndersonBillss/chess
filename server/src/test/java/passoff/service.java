@@ -1,6 +1,7 @@
 package passoff;
 
 import dataaccess.*;
+import dto.CreateGameRequest;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -109,5 +110,29 @@ public class service {
 
         LoginRequest loginRequest = new LoginRequest("Joe", "123");
         assertThrows(UnauthorizedException.class, () -> authService.login(loginRequest, null));
+    }
+
+    @Test
+    void createGameSuccessTest()
+            throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest registerReq = new RegisterRequest("John", "123", "test@test");
+        var authToken = userService.register(registerReq).authToken();
+
+        String gameName = "TestGame";
+        CreateGameRequest req = new CreateGameRequest(gameName);
+        var res = gameService.createGame(req, authToken);
+
+        var game = gameDao.getGame(res.gameID());
+        assertEquals(gameName, game.gameName());
+    }
+
+    @Test
+    void createGameNullNameTest()
+            throws BadRequestException, DataAccessException, AlreadyTakenException {
+        RegisterRequest registerReq = new RegisterRequest("John", "123", "test@test");
+        var authToken = userService.register(registerReq).authToken();
+
+        CreateGameRequest req = new CreateGameRequest(null);
+        assertThrows(BadRequestException.class, () -> gameService.createGame(req, authToken));
     }
 }
