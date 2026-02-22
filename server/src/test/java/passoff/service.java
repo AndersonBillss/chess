@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class service {
     private AuthDAO authDao;
@@ -38,9 +38,17 @@ public class service {
         var res = userService.register(req);
 
         var user = userDao.getUser(res.username());
-        assertNotEquals(null, user);
+        assertEquals("John", user.username());
 
         var session = authDao.getAuth(res.authToken());
-        assertNotEquals(null, session);
+        assertEquals("John", session.username());
+    }
+
+    @Test
+    void registerDuplicateNamesTest()
+            throws DataAccessException, AlreadyTakenException {
+        RegisterRequest req = new RegisterRequest("John", "Doe", "test@test");
+        userService.register(req);
+        assertThrows(AlreadyTakenException.class, () -> userService.register(req));
     }
 }
