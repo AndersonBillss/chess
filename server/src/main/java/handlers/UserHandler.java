@@ -1,7 +1,6 @@
 package handlers;
 
 import com.google.gson.Gson;
-import dto.ErrorResult;
 import dto.RegisterRequest;
 import dto.RegisterResult;
 import io.javalin.http.Context;
@@ -15,16 +14,11 @@ public class UserHandler {
         this.service = new UserService();
     }
 
-    public void register(Context ctx) {
+    public void register(Context ctx) throws AlreadyTakenException {
         var gson = new Gson();
         RegisterRequest req = gson.fromJson(ctx.body(), RegisterRequest.class);
         RegisterResult res;
-        try {
-            res = service.register(req);
-        } catch (AlreadyTakenException e) {
-            ctx.status(409).json(gson.toJson(new ErrorResult(e)));
-            return;
-        }
+        res = service.register(req);
         ctx.json(gson.toJson(res));
     }
 }

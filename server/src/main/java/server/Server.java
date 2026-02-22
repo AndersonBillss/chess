@@ -1,5 +1,6 @@
 package server;
 
+import handlers.HandlerUtils;
 import handlers.UserHandler;
 import io.javalin.*;
 
@@ -13,7 +14,7 @@ public class Server {
         var userHandler = new UserHandler();
         // Register your endpoints and exception handlers here.
         javalin
-                .post("/user", userHandler::register);
+                .post("/user", HandlerUtils.handleErr(userHandler::register));
     }
 
     public int run(int desiredPort) {
