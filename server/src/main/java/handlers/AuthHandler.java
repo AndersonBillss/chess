@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dto.LoginRequest;
 import dto.LoginResult;
+import dto.LogoutRequest;
 import io.javalin.http.Context;
-import service.AlreadyTakenException;
 import service.AuthService;
 import service.NotFoundException;
 
@@ -21,5 +21,12 @@ public class AuthHandler {
         LoginRequest req = gson.fromJson(ctx.body(), LoginRequest.class);
         LoginResult res = service.login(req);
         ctx.json(gson.toJson(res));
+    }
+
+    public void logout(Context ctx) throws NotFoundException, DataAccessException {
+        var gson = new Gson();
+        LogoutRequest req = gson.fromJson(ctx.body(), LogoutRequest.class);
+        service.logout(req);
+        ctx.status(200);
     }
 }

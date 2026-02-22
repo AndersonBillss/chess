@@ -17,7 +17,8 @@ public class Server {
         // Register your endpoints and exception handlers here.
         javalin
                 .post("/user", HandlerUtils.handleErr(userHandler::register))
-                .post("/session", HandlerUtils.handleErr(authHandler::login));
+                .post("/session", HandlerUtils.handleErr(authHandler::login))
+                .delete("/session", HandlerUtils.handleErr(authHandler::logout));
     }
 
     public int run(int desiredPort) {
