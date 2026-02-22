@@ -7,7 +7,6 @@ import dto.LoginResult;
 import io.javalin.http.Context;
 import service.AuthService;
 import service.BadRequestException;
-import service.NotFoundException;
 import service.UnauthorizedException;
 
 public class AuthHandler {
@@ -25,7 +24,7 @@ public class AuthHandler {
         ctx.json(gson.toJson(res));
     }
 
-    public void logout(Context ctx) throws NotFoundException, DataAccessException, UnauthorizedException {
+    public void logout(Context ctx) throws DataAccessException, UnauthorizedException {
         var authToken = ctx.header("Authorization");
         service.logout(authToken);
         ctx.status(200);

@@ -70,7 +70,7 @@ public class service {
         var res = userService.register(req);
 
         authService.logout(res.authToken());
-        assertThrows(NotFoundException.class, () -> authService.logout(res.authToken()));
+        assertThrows(UnauthorizedException.class, () -> authService.logout(res.authToken()));
     }
 
     @Test
@@ -108,6 +108,6 @@ public class service {
         authService.logout(res.authToken());
 
         LoginRequest loginRequest = new LoginRequest("Joe", "123");
-        assertThrows(NotFoundException.class, () -> authService.login(loginRequest, null));
+        assertThrows(UnauthorizedException.class, () -> authService.login(loginRequest, null));
     }
 }
