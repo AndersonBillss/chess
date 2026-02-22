@@ -22,8 +22,7 @@ public class UserHandler {
         try {
             res = service.register(req);
         } catch (AlreadyTakenException e) {
-            var errorMessage = new ErrorResult(e);
-            ctx.status(409).json(gson.toJson(errorMessage));
+            ctx.status(409).json(gson.toJson(new ErrorResult(e)));
             return;
         }
         ctx.json(gson.toJson(res));

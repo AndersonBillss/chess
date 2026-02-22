@@ -17,7 +17,6 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest req) throws AlreadyTakenException {
-        System.out.println("REGISTERED!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         UserData newUser = new UserData(req.username(), req.password(), req.email());
         try {
             userDAO.createUser(newUser);
