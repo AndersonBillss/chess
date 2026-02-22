@@ -15,7 +15,10 @@ public class UserService {
         this.userDAO = userDao;
     }
 
-    public RegisterResult register(RegisterRequest req) throws AlreadyTakenException, DataAccessException {
+    public RegisterResult register(RegisterRequest req) throws AlreadyTakenException, DataAccessException, BadRequestException {
+        if (req.username() == null || req.password() == null || req.email() == null) {
+            throw new BadRequestException();
+        }
         UserData newUser = new UserData(req.username(), req.password(), req.email());
         var existingUser = userDAO.getUser(req.username());
         if (existingUser != null) {

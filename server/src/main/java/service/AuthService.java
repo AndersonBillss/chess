@@ -17,7 +17,10 @@ public class AuthService {
     }
 
     public LoginResult login(LoginRequest req, String authToken)
-            throws DataAccessException, UnauthorizedException {
+            throws DataAccessException, UnauthorizedException, BadRequestException {
+        if (req.username() == null || req.password() == null) {
+            throw new BadRequestException();
+        }
         var existingUser = userDAO.getUser(req.username());
         if (existingUser == null) {
             throw new UnauthorizedException();
@@ -34,10 +37,10 @@ public class AuthService {
         return new LoginResult(req.username(), token);
     }
 
-    public void logout(String authToken) throws NotFoundException, DataAccessException {
+    public void logout(String authToken) throws DataAccessException, UnauthorizedException {
         var existingSession = authDao.getAuth(authToken);
         if (existingSession == null) {
-            throw new NotFoundException();
+            throw new UnauthorizedException();
         }
         authDao.deleteAuth(authToken);
     }

@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dto.*;
 import io.javalin.http.Context;
-import service.AlreadyTakenException;
-import service.GameService;
-import service.NotFoundException;
-import service.UnauthorizedException;
+import service.*;
 
 public class GameHandler {
     private final GameService service;
@@ -25,7 +22,7 @@ public class GameHandler {
     }
 
     public void createGame(Context ctx)
-            throws DataAccessException, UnauthorizedException {
+            throws DataAccessException, UnauthorizedException, BadRequestException {
         var gson = new Gson();
         CreateGameRequest req = gson.fromJson(ctx.body(), CreateGameRequest.class);
         var authToken = ctx.header("Authorization");
@@ -34,7 +31,7 @@ public class GameHandler {
     }
 
     public void joinGame(Context ctx)
-            throws DataAccessException, UnauthorizedException, NotFoundException, AlreadyTakenException {
+            throws DataAccessException, UnauthorizedException, AlreadyTakenException, BadRequestException {
         var gson = new Gson();
         JoinGameRequest req = gson.fromJson(ctx.body(), JoinGameRequest.class);
         var authToken = ctx.header("Authorization");

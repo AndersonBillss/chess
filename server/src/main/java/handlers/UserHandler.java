@@ -6,6 +6,7 @@ import dto.RegisterRequest;
 import dto.RegisterResult;
 import io.javalin.http.Context;
 import service.AlreadyTakenException;
+import service.BadRequestException;
 import service.UserService;
 
 public class UserHandler {
@@ -15,7 +16,7 @@ public class UserHandler {
         this.service = service;
     }
 
-    public void register(Context ctx) throws AlreadyTakenException, DataAccessException {
+    public void register(Context ctx) throws AlreadyTakenException, DataAccessException, BadRequestException {
         var gson = new Gson();
         RegisterRequest req = gson.fromJson(ctx.body(), RegisterRequest.class);
         RegisterResult res = service.register(req);

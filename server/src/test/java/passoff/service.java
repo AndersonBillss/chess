@@ -33,7 +33,7 @@ public class service {
 
     @Test
     void registerSuccessTest()
-            throws DataAccessException, AlreadyTakenException {
+            throws DataAccessException, AlreadyTakenException, BadRequestException {
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);
 
@@ -46,14 +46,15 @@ public class service {
 
     @Test
     void registerDuplicateNamesTest()
-            throws DataAccessException, AlreadyTakenException {
+            throws DataAccessException, AlreadyTakenException, BadRequestException {
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         userService.register(req);
         assertThrows(AlreadyTakenException.class, () -> userService.register(req));
     }
 
     @Test
-    void logoutSuccessTest() throws AlreadyTakenException, DataAccessException, NotFoundException {
+    void logoutSuccessTest()
+            throws AlreadyTakenException, DataAccessException, BadRequestException, UnauthorizedException {
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);
 
@@ -63,7 +64,8 @@ public class service {
     }
 
     @Test
-    void logoutTwiceTest() throws AlreadyTakenException, DataAccessException, NotFoundException {
+    void logoutTwiceTest()
+            throws AlreadyTakenException, DataAccessException, BadRequestException, UnauthorizedException {
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);
 
@@ -73,7 +75,7 @@ public class service {
 
     @Test
     void loginSuccessTest()
-            throws AlreadyTakenException, DataAccessException, NotFoundException, UnauthorizedException {
+            throws AlreadyTakenException, DataAccessException, UnauthorizedException, BadRequestException {
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);
         authService.logout(res.authToken());
@@ -87,7 +89,7 @@ public class service {
 
     @Test
     void loginIncorrectPasswordTest()
-            throws AlreadyTakenException, DataAccessException, NotFoundException {
+            throws AlreadyTakenException, DataAccessException, BadRequestException, UnauthorizedException {
 
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);
@@ -99,7 +101,7 @@ public class service {
 
     @Test
     void loginIncorrectUsernameTest()
-            throws AlreadyTakenException, DataAccessException, NotFoundException {
+            throws AlreadyTakenException, DataAccessException, BadRequestException, UnauthorizedException {
 
         RegisterRequest req = new RegisterRequest("John", "123", "test@test");
         var res = userService.register(req);

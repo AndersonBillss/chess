@@ -30,7 +30,10 @@ public class GameService {
     }
 
     public CreateGameResult createGame(CreateGameRequest req, String authToken)
-            throws DataAccessException, UnauthorizedException {
+            throws DataAccessException, UnauthorizedException, BadRequestException {
+        if (req.gameName() == null) {
+            throw new BadRequestException();
+        }
         if (authDao.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
@@ -47,7 +50,11 @@ public class GameService {
     }
 
     public void joinGame(JoinGameRequest req, String authToken)
-            throws DataAccessException, UnauthorizedException, NotFoundException, AlreadyTakenException {
+            throws DataAccessException, UnauthorizedException, AlreadyTakenException, BadRequestException {
+        if (!Objects.equals(req.playerColor(), "BLACK") && !Objects.equals(req.playerColor(), "WHITE")) {
+            throw new BadRequestException();
+        }
+
         var session = authDao.getAuth(authToken);
         if (session == null) {
             throw new UnauthorizedException();
@@ -56,7 +63,7 @@ public class GameService {
 
         GameData data = gameDAO.getGame(req.gameID());
         if (data == null) {
-            throw new NotFoundException();
+            throw new BadRequestException();
         }
 
         String existingUser = Objects.equals(req.playerColor(), "BLACK") ?
