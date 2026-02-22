@@ -3,13 +3,12 @@ package service;
 import dataaccess.*;
 import dto.RegisterRequest;
 import dto.RegisterResult;
+import model.AuthData;
 import model.UserData;
 
-import javax.xml.crypto.Data;
-
 public class UserService {
-    private AuthDAO authDao;
-    private UserDAO userDAO;
+    private final AuthDAO authDao;
+    private final UserDAO userDAO;
 
     public UserService() {
         this.authDao = new MemoryAuthDAO();
@@ -23,6 +22,8 @@ public class UserService {
             throw new AlreadyTakenException("Error: username already taken");
         }
         userDAO.createUser(newUser);
-        return new RegisterResult("test", "This is a test token");
+        String token = ServiceUtils.generateToken();
+        authDao.createAuth(new AuthData(token, newUser.username()));
+        return new RegisterResult(token, newUser.username());
     }
 }

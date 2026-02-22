@@ -1,4 +1,4 @@
 package dto;
 
-public record RegisterResult(String username, String authToken) {
+public record RegisterResult(String authToken, String username) {
 }
