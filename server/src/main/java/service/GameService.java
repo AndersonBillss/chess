@@ -4,8 +4,11 @@ import chess.ChessGame;
 import dataaccess.*;
 import dto.CreateGameRequest;
 import dto.CreateGameResult;
+import dto.JoinGameRequest;
 import dto.ListGamesResult;
 import model.GameData;
+
+import java.util.Collection;
 
 public class GameService {
     private final AuthDAO authDao;
@@ -40,6 +43,47 @@ public class GameService {
         );
         gameDAO.createGame(game);
         return new CreateGameResult(newGameId);
+    }
+
+    public void joinGame(JoinGameRequest req, String authToken)
+            throws DataAccessException, UnauthorizedException, NotFoundException, AlreadyTakenException {
+        var session = authDao.getAuth(authToken);
+        if (session == null) {
+            throw new UnauthorizedException();
+        }
+        String username = session.username();
+
+        GameData data = gameDAO.getGame(req.gameID());
+        if (data == null) {
+            throw new NotFoundException();
+        }
+
+        String existingUser = req.playerColor() == "BLACK" ?
+                data.blackUsername() :
+                data.whiteUsername();
+
+        if (existingUser != null) {
+            throw new AlreadyTakenException();
+        }
+
+        GameData newGame;
+        if (req.playerColor() == "BLACK") {
+            newGame = new GameData(
+                    data.gameID(),
+                    data.whiteUsername(),
+                    username,
+                    data.gameName(),
+                    data.game());
+        } else {
+            newGame = new GameData(
+                    data.gameID(),
+                    username,
+                    data.blackUsername(),
+                    data.gameName(),
+                    data.game());
+        }
+
+        gameDAO.createGame(newGame);
     }
 
     public int generateGameId() {

@@ -20,6 +20,12 @@ public class MemoryGameDAO implements GameDAO {
         return games.get(gameID);
     }
 
+    @Override
+    public void editGame(int gameID, GameData data) throws DataAccessException {
+        games.remove(gameID);
+        games.put(gameID, data);
+    }
+
     public Collection<GameData> getGames() throws DataAccessException {
         return games.values();
     }

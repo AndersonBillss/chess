@@ -1,4 +1,4 @@
 package dto;
 
-public record JoinGameRequest(String PlayerColor, int gameID) {
+public record JoinGameRequest(String playerColor, int gameID) {
 }
