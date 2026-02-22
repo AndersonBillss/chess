@@ -8,8 +8,6 @@ import dto.JoinGameRequest;
 import dto.ListGamesResult;
 import model.GameData;
 
-import java.util.Collection;
-
 public class GameService {
     private final AuthDAO authDao;
     private final GameDAO gameDAO;
