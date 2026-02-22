@@ -21,7 +21,9 @@ public class Server {
                 .post("/user", HandlerUtils.handleErr(userHandler::register))
                 .post("/session", HandlerUtils.handleErr(authHandler::login))
                 .delete("/session", HandlerUtils.handleErr(authHandler::logout))
-                .post("/game", HandlerUtils.handleErr(gameHandler::createGame));
+                .get("/game", HandlerUtils.handleErr(gameHandler::listGames))
+                .post("/game", HandlerUtils.handleErr(gameHandler::createGame))
+                .put("/game", HandlerUtils.handleErr(gameHandler::joinGame));
     }
 
     public int run(int desiredPort) {
