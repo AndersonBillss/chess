@@ -1,6 +1,7 @@
 package server;
 
 import handlers.AuthHandler;
+import handlers.GameHandler;
 import handlers.HandlerUtils;
 import handlers.UserHandler;
 import io.javalin.*;
@@ -14,11 +15,13 @@ public class Server {
 
         var userHandler = new UserHandler();
         var authHandler = new AuthHandler();
+        var gameHandler = new GameHandler();
         // Register your endpoints and exception handlers here.
         javalin
                 .post("/user", HandlerUtils.handleErr(userHandler::register))
                 .post("/session", HandlerUtils.handleErr(authHandler::login))
-                .delete("/session", HandlerUtils.handleErr(authHandler::logout));
+                .delete("/session", HandlerUtils.handleErr(authHandler::logout))
+                .post("/game", HandlerUtils.handleErr(gameHandler::createGame));
     }
 
     public int run(int desiredPort) {
