@@ -16,13 +16,13 @@ public class UserService {
         this.userDAO = new MemoryUserDAO();
     }
 
-    public RegisterResult register(RegisterRequest req) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest req) throws AlreadyTakenException, DataAccessException {
         UserData newUser = new UserData(req.username(), req.password(), req.email());
-        try {
-            userDAO.createUser(newUser);
-        } catch (DataAccessException e) {
+        var existingUser = userDAO.getUser(req.username());
+        if (existingUser != null) {
             throw new AlreadyTakenException("Error: username already taken");
         }
+        userDAO.createUser(newUser);
         return new RegisterResult("test", "This is a test token");
     }
 }

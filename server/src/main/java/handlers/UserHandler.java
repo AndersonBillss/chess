@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dto.RegisterRequest;
 import dto.RegisterResult;
 import io.javalin.http.Context;
@@ -14,7 +15,7 @@ public class UserHandler {
         this.service = new UserService();
     }
 
-    public void register(Context ctx) throws AlreadyTakenException {
+    public void register(Context ctx) throws AlreadyTakenException, DataAccessException {
         var gson = new Gson();
         RegisterRequest req = gson.fromJson(ctx.body(), RegisterRequest.class);
         RegisterResult res;

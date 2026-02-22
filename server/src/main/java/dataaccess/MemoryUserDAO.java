@@ -12,20 +12,12 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void createUser(UserData u) throws DataAccessException {
-        boolean userFound = users.get(u.username()) != null;
-        if(userFound) {
-            throw new DataAccessException("User already exists");
-        }
+    public void createUser(UserData u) {
         users.put(u.username(), u);
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        var result = users.get(username);
-        if (result == null) {
-            throw new DataAccessException("Username doesn't exist");
-        }
-        return result;
+    public UserData getUser(String username) {
+        return users.get(username);
     }
 }

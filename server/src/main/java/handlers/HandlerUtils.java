@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dto.ErrorResult;
 import io.javalin.http.Handler;
 import service.ServiceException;
@@ -15,7 +16,10 @@ public class HandlerUtils {
                 handlerFn.handle(ctx);
             } catch (ServiceException e) {
                 var gson = new Gson();
-                ctx.status(409).json(gson.toJson(new ErrorResult(e.getMessage())));
+                ctx.status(e.getStatus()).json(gson.toJson(new ErrorResult(e.getMessage())));
+            } catch (DataAccessException e) {
+                var gson = new Gson();
+                ctx.status(500).json(gson.toJson(new ErrorResult("Internal Server Error")));
             }
         };
     }
