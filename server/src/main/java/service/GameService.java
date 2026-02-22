@@ -21,16 +21,16 @@ public class GameService {
         if (authDao.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
-        int gameId = generateGameId();
+        int newGameId = generateGameId();
         GameData game = new GameData(
-                gameId,
+                newGameId,
                 null,
                 null,
                 req.gameName(),
                 new ChessGame()
         );
         gameDAO.createGame(game);
-        return new CreateGameResult(gameId);
+        return new CreateGameResult(newGameId);
     }
 
     public int generateGameId() {
