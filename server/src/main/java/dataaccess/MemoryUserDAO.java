@@ -5,7 +5,7 @@ import model.UserData;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO {
-    private final HashMap<String, UserData> users;
+    private HashMap<String, UserData> users;
 
     public MemoryUserDAO() {
         users = new HashMap<>();
@@ -19,5 +19,10 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) {
         return users.get(username);
+    }
+
+    @Override
+    public void clear() {
+        users = new HashMap<>();
     }
 }

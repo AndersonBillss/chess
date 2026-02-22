@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
-    private final HashMap<Integer, GameData> games;
+    private HashMap<Integer, GameData> games;
 
     public MemoryGameDAO() {
         games = new HashMap<>();
@@ -20,13 +20,16 @@ public class MemoryGameDAO implements GameDAO {
         return games.get(gameID);
     }
 
-    @Override
-    public void editGame(int gameID, GameData data) throws DataAccessException {
-        games.remove(gameID);
-        games.put(gameID, data);
+    public void editGame(GameData data) throws DataAccessException {
+        games.remove(data.gameID());
+        games.put(data.gameID(), data);
     }
 
     public Collection<GameData> getGames() throws DataAccessException {
         return games.values();
+    }
+
+    public void clear() {
+        games = new HashMap<>();
     }
 }

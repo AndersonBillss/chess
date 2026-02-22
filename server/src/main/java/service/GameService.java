@@ -83,7 +83,7 @@ public class GameService {
                     data.game());
         }
 
-        gameDAO.createGame(newGame);
+        gameDAO.editGame(newGame);
     }
 
     public int generateGameId() {

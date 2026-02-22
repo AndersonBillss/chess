@@ -1,10 +1,11 @@
 package dataaccess;
 
 import model.AuthData;
+
 import java.util.HashMap;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private final HashMap<String, AuthData> authSessions;
+    private HashMap<String, AuthData> authSessions;
 
     public MemoryAuthDAO() {
         authSessions = new HashMap<>();
@@ -20,5 +21,9 @@ public class MemoryAuthDAO implements AuthDAO {
 
     public void deleteAuth(String token) {
         authSessions.remove(token);
+    }
+
+    public void clear() {
+        authSessions = new HashMap<>();
     }
 }
