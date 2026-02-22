@@ -18,8 +18,7 @@ public class UserHandler {
     public void register(Context ctx) throws AlreadyTakenException, DataAccessException {
         var gson = new Gson();
         RegisterRequest req = gson.fromJson(ctx.body(), RegisterRequest.class);
-        RegisterResult res;
-        res = service.register(req);
+        RegisterResult res = service.register(req);
         ctx.json(gson.toJson(res));
     }
 }
