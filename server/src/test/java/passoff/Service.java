@@ -8,7 +8,7 @@ import service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class service {
+class Service {
     private AuthDAO authDao;
     private UserDAO userDao;
     private GameDAO gameDao;
@@ -181,5 +181,27 @@ public class service {
         gameService.joinGame(req1, p1AuthToken);
         JoinGameRequest req2 = new JoinGameRequest("WHITE", game.gameID());
         assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(req2, p2AuthToken));
+    }
+
+    @Test
+    void clearDBTest()
+            throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest registerReq1 = new RegisterRequest("John", "123", "test@test");
+        var p1AuthToken = userService.register(registerReq1).authToken();
+        RegisterRequest registerReq2 = new RegisterRequest("Bob", "123", "test@test");
+        var p2AuthToken = userService.register(registerReq2).authToken();
+        var game = gameService.createGame(new CreateGameRequest("TestGame1"), p1AuthToken);
+
+        JoinGameRequest req1 = new JoinGameRequest("WHITE", game.gameID());
+        gameService.joinGame(req1, p1AuthToken);
+        JoinGameRequest req2 = new JoinGameRequest("BLACK", game.gameID());
+        gameService.joinGame(req2, p2AuthToken);
+
+        dbService.clear();
+        assertNull(authDao.getAuth(p1AuthToken));
+        assertNull(authDao.getAuth(p2AuthToken));
+        assertNull(userDao.getUser("John"));
+        assertNull(userDao.getUser("Bob"));
+        assertNull(gameDao.getGame(game.gameID()));
     }
 }
