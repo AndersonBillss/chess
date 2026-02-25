@@ -30,7 +30,13 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        final Map<PieceType, String> pieceToString = Map.of(PieceType.KING, "k", PieceType.QUEEN, "q", PieceType.BISHOP, "b", PieceType.KNIGHT, "n", PieceType.ROOK, "r", PieceType.PAWN, "p");
+        final Map<PieceType, String> pieceToString = Map.of(
+                PieceType.KING, "k",
+                PieceType.QUEEN, "q",
+                PieceType.BISHOP, "b",
+                PieceType.KNIGHT, "n",
+                PieceType.ROOK, "r",
+                PieceType.PAWN, "p");
 
         String pieceString = pieceToString.get(type);
         if (pieceColor == ChessGame.TeamColor.WHITE) {
@@ -223,7 +229,7 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPosition forwardOne = position.add(forward());
         if (board.inBounds(forwardOne) && board.getPiece(forwardOne) == null) {
-            moves.addAll(pawnPromotion(board, position, forwardOne, teamColor));
+            moves.addAll(pawnPromotion(board, position, forwardOne));
         }
         ChessPosition backwardOne = position.add(backward());
         ChessPosition backwardTwo = position.add(backward().mul(2));
@@ -236,10 +242,10 @@ public class ChessPiece {
         var forwardLeft = position.add(forward().add(left()));
         var forwardRight = position.add(forward().add(right()));
         if (canOvertake(board, forwardLeft, teamColor) && board.getPiece(forwardLeft) != null) {
-            moves.addAll(pawnPromotion(board, position, forwardLeft, teamColor));
+            moves.addAll(pawnPromotion(board, position, forwardLeft));
         }
         if (canOvertake(board, forwardRight, teamColor) && board.getPiece(forwardRight) != null) {
-            moves.addAll(pawnPromotion(board, position, forwardRight, teamColor));
+            moves.addAll(pawnPromotion(board, position, forwardRight));
         }
 
         // En Passant
@@ -262,7 +268,10 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> pawnPromotion(ChessBoard board, ChessPosition oldPosition, ChessPosition newPosition, ChessGame.TeamColor teamColor) {
+    private Collection<ChessMove> pawnPromotion(
+            ChessBoard board,
+            ChessPosition oldPosition,
+            ChessPosition newPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         var canPromote = !board.inBounds(newPosition.add(forward()));
         if (canPromote) {
