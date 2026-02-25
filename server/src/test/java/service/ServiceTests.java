@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Service {
+class ServiceTests {
     private AuthDAO authDao;
     private UserDAO userDao;
     private GameDAO gameDao;
