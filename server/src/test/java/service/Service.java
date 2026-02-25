@@ -1,10 +1,9 @@
-package Service;
+package service;
 
 import dataaccess.*;
 import dto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
