@@ -50,33 +50,6 @@ public class ChessBoard {
         return finalString;
     }
 
-    // This method is super useful, but the autograder complains when I use it
-    // So I comment it out until I need it
-//    public String showPositions(Collection<ChessPosition> positions) {
-//        String finalString = "";
-//        for (int i = 7; i > -1; i--) {
-//            var row = board[i];
-//            finalString += "|";
-//            for (int j = 0; j < row.length; j++) {
-//                var col = row[j];
-//                if (col == null) {
-//                    var cellPos = new ChessPosition(i + 1, j + 1);
-//                    if (positions.contains(cellPos)) {
-//                        finalString += "X";
-//                    } else {
-//                        finalString += " ";
-//                    }
-//                } else {
-//                    finalString += col;
-//                }
-//                ;
-//                finalString += "|";
-//            }
-//            finalString += "\n";
-//        }
-//        return finalString;
-//    }
-
     public ChessBoard() {
         board = new ChessPiece[8][8];
         clearBoard();
