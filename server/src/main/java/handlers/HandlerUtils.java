@@ -21,10 +21,12 @@ public class HandlerUtils {
                 ctx.status(e.getStatus()).json(gson.toJson(new ErrorResult(e.getMessage())));
             } catch (JsonSyntaxException e) {
                 ctx.status(400).json("Error: bad request");
-            }
-            catch (DataAccessException e) {
+            } catch (DataAccessException e) {
                 var gson = new Gson();
-                ctx.status(500).json(gson.toJson(new ErrorResult("Error: could not connect to database")));
+                System.err.printf(
+                        "Database Error: %s%n", e.getMessage()
+                );
+                ctx.status(500).json(gson.toJson(new ErrorResult("Internal Server Error")));
             } catch (Exception e) {
                 var gson = new Gson();
                 ctx.status(500).json(gson.toJson(new ErrorResult(e.getMessage())));

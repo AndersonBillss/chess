@@ -3,6 +3,7 @@ package dataaccess;
 import model.UserData;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class MySqlUserDAO implements UserDAO {
@@ -12,6 +13,19 @@ public class MySqlUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData u) throws DataAccessException {
+        var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?);";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, u.username());
+                ps.setString(2, u.password());
+                ps.setString(3, u.email());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(
+                    String.format("Unable to create user: %s%n", e.getMessage())
+            );
+        }
     }
 
     @Override
