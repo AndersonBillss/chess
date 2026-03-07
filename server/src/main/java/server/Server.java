@@ -24,7 +24,15 @@ public class Server {
             System.exit(1);
         }
 
-        var authDao = new MemoryAuthDAO();
+        AuthDAO authDao;
+        try {
+            authDao = new MySqlAuthDAO();
+        } catch (DataAccessException e) {
+            System.err.printf("Error creating auth DAO: %s%n", e.getMessage());
+            System.exit(1);
+            return;
+        }
+
         UserDAO userDao;
         try {
             userDao = new MySqlUserDAO();
