@@ -52,7 +52,16 @@ public class MySqlUserDAO implements UserDAO {
 
     @Override
     public void clear() throws DataAccessException {
-
+        var statement = "DELETE FROM users;";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(
+                    String.format("Unable to get user: %s%n", e.getMessage())
+            );
+        }
     }
 
     private void createTable() throws DataAccessException {
