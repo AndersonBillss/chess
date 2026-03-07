@@ -1,14 +1,14 @@
 package server;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import handlers.*;
 import io.javalin.*;
 import service.AuthService;
 import service.DBService;
 import service.GameService;
 import service.UserService;
+
+import javax.xml.crypto.Data;
 
 public class Server {
 
@@ -17,8 +17,22 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            System.err.printf("Error connecting to database: %s%n", e.getMessage());
+            System.exit(1);
+        }
+
         var authDao = new MemoryAuthDAO();
-        var userDao = new MemoryUserDAO();
+        UserDAO userDao;
+        try {
+            userDao = new MySqlUserDAO();
+        } catch (DataAccessException e) {
+            System.err.printf("Error creating user DAO: %s%n", e.getMessage());
+            System.exit(1);
+            return;
+        }
         var gameDao = new MemoryGameDAO();
 
         var userService = new UserService(authDao, userDao);
