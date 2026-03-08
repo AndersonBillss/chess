@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MySqlDAOTests {
     interface SelectCB {
@@ -63,5 +64,11 @@ public class MySqlDAOTests {
                     assertEquals(newUser.email(), resultEmail);
                 }
         );
+    }
+
+    @Test
+    void userDaoCreateUserNullUsernameTest() {
+        UserData newUser = new UserData(null, "superSecure", "luke@test");
+        assertThrows(DataAccessException.class, () -> userDao.createUser(newUser));
     }
 }
