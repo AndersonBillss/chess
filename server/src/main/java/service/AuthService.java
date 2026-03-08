@@ -25,9 +25,11 @@ public class AuthService {
         if (existingUser == null) {
             throw new UnauthorizedException();
         }
-        var existingSession = authDao.getAuth(authToken);
-        if (existingSession != null) {
-            throw new UnauthorizedException();
+        if(authToken != null) {
+            var existingSession = authDao.getAuth(authToken);
+            if (existingSession != null) {
+                throw new UnauthorizedException();
+            }
         }
         if (!BCrypt.checkpw(req.password(), existingUser.password())) {
             throw new UnauthorizedException();

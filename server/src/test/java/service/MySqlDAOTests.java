@@ -1,7 +1,10 @@
 package service;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +27,7 @@ public class MySqlDAOTests {
         void onSelect(ResultSet res) throws SQLException;
     }
 
-    void executeSelect(String query, SelectCB cb, Object... params) throws DataAccessException, SQLException {
+    static void executeSelect(String query, SelectCB cb, Object... params) throws DataAccessException, SQLException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 for (int i = 0; i < params.length; i++) {
@@ -44,7 +47,7 @@ public class MySqlDAOTests {
         }
     }
 
-    void executeUpdate(String query, Object... params) throws DataAccessException, SQLException {
+    static void executeUpdate(String query, Object... params) throws DataAccessException, SQLException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 for (int i = 0; i < params.length; i++) {
@@ -63,11 +66,12 @@ public class MySqlDAOTests {
     }
 
     @BeforeAll
-    static void startUp() throws DataAccessException {
+    static void startUp() throws DataAccessException, SQLException {
         DatabaseManager.createDatabase();
         authDao = new MySqlAuthDAO();
         userDao = new MySqlUserDAO();
         gameDao = new MySqlGameDAO();
+        executeUpdate("TRUNCATE TABLE games;");
     }
 
     @BeforeEach
@@ -196,5 +200,38 @@ public class MySqlDAOTests {
         executeSelect("SELECT username FROM auth", res -> {
             assertFalse(res.next());
         });
+    }
+
+    @Test
+    void gameDaoCreateGameTest() throws DataAccessException, SQLException {
+        GameData game = new GameData(
+                0, null, null, "TestGame", new ChessGame());
+        gameDao.createGame(game);
+        executeSelect("SELECT gameName FROM games", res -> {
+            var resultGameName = res.getString(1);
+            assertEquals(game.gameName(), resultGameName);
+            assertFalse(res.next());
+        });
+    }
+
+    @Test
+    void gameDaoCreateGameNullGameNameTest() {
+        GameData game = new GameData(
+                0, null, null, null, new ChessGame());
+        assertThrows(DataAccessException.class, () -> gameDao.createGame(game));
+    }
+
+    @Test
+    void gameDaoGetGameTest() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        String gameJson = gson.toJson(game);
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame", gameJson);
+
+        assertEquals("TestGame", gameDao.getGame(1).gameName());
     }
 }
