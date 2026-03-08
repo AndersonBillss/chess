@@ -18,7 +18,7 @@ public class MySqlGameDAO implements GameDAO {
     @Override
     public void createGame(GameData data) throws DataAccessException {
         var statement =
-                "INSERT INTO game " +
+                "INSERT INTO games" +
                         "(id, whiteUsername, blackUsername, gameName, game) " +
                         "VALUES (?, ?, ?, ?, ?);";
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -42,7 +42,7 @@ public class MySqlGameDAO implements GameDAO {
     public GameData getGame(int gameID) throws DataAccessException {
         var statement = "SELECT " +
                 "id, whiteUsername, blackUsername, gameName, game " +
-                "FROM games WHERE gameID=?;";
+                "FROM games WHERE id=?;";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
@@ -74,7 +74,25 @@ public class MySqlGameDAO implements GameDAO {
 
     @Override
     public void editGame(GameData data) throws DataAccessException {
-
+        var statement =
+                "UPDATE games " +
+                        "SET whiteUsername=?, blackUsername=?, gameName=?, game=? " +
+                        "WHERE id = ?;";
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, data.whiteUsername());
+                ps.setString(2, data.blackUsername());
+                ps.setString(3, data.gameName());
+                var gson = new Gson();
+                ps.setString(4, gson.toJson(data.game()));
+                ps.setInt(5, data.gameID());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(
+                    String.format("Unable to edit game: %s%n", e.getMessage())
+            );
+        }
     }
 
     @Override
@@ -99,7 +117,7 @@ public class MySqlGameDAO implements GameDAO {
 
     private void createTable() throws DataAccessException {
         final String createStatement = """
-                CREATE TABLE IF NOT EXISTS game (
+                CREATE TABLE IF NOT EXISTS games (
                   `id` int NOT NULL,
                   `whiteUsername` varchar(256) default NULL,
                   `blackUsername` varchar(256) default NULL,
