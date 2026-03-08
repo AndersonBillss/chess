@@ -12,25 +12,30 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static java.sql.Types.NULL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MySqlDAOTests {
-    interface SelectCB {
-        void onSelect(ResultSet res) throws SQLException;
-    }
-
-    interface UpdateCB {
-        void onUpdate(ResultSet res) throws SQLException;
-    }
-
     private static MySqlAuthDAO authDao;
     private static MySqlUserDAO userDao;
     private static MySqlGameDAO gameDao;
 
-    void executeSelect(String query, SelectCB cb) throws DataAccessException, SQLException {
+    interface SelectCB {
+        void onSelect(ResultSet res) throws SQLException;
+    }
+
+    void executeSelect(String query, SelectCB cb, Object... params) throws DataAccessException, SQLException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String p) {
+                        ps.setString(i + 1, p);
+                    } else if (param instanceof Integer p) {
+                        ps.setInt(i + 1, p);
+                    } else if (param == null) {
+                        ps.setNull(i + 1, NULL);
+                    }
+                }
                 var resultSet = ps.executeQuery();
                 resultSet.next();
                 cb.onSelect(resultSet);
@@ -109,4 +114,21 @@ public class MySqlDAOTests {
     void userDaoGetUserNullUsernameTest() {
         assertThrows(DataAccessException.class, () -> userDao.getUser(null));
     }
+
+    @Test
+    void userDaoClearTest() throws SQLException, DataAccessException {
+        executeUpdate("INSERT INTO users (username, password, email) VALUES (?, ?, ?);",
+                "1", "2", "3");
+        executeUpdate("INSERT INTO users (username, password, email) VALUES (?, ?, ?);",
+                "4", "5", "6");
+        executeUpdate("INSERT INTO users (username, password, email) VALUES (?, ?, ?);",
+                "7", "8", "9");
+
+        userDao.clear();
+        executeSelect("SELECT username FROM users", res -> {
+            assertFalse(res.next());
+        });
+    }
+
+
 }
