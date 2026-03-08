@@ -15,14 +15,15 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     public int createGame(GameData data) throws DataAccessException {
+        int gameId = getNextId();
         GameData newData = new GameData(
-                getNextId(),
+                gameId,
                 data.whiteUsername(),
                 data.blackUsername(),
                 data.gameName(),
                 data.game());
-        games.put(data.gameID(), data);
-        return newData.gameID();
+        games.put(gameId, newData);
+        return gameId;
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
