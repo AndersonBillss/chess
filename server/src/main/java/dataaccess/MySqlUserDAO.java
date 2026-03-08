@@ -30,6 +30,9 @@ public class MySqlUserDAO implements UserDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
+        if(username == null) {
+            throw new DataAccessException("Username cannot be null");
+        }
         var statement = "SELECT username, password, email FROM users WHERE username=?;";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
