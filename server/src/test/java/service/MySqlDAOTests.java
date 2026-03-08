@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,5 +131,70 @@ public class MySqlDAOTests {
         });
     }
 
+    @Test
+    void authDaoCreateAuthTest() throws DataAccessException, SQLException {
+        AuthData newAuth = new AuthData("TEST", "Batman");
+        authDao.createAuth(newAuth);
+        executeSelect(
+                "SELECT authToken, username FROM auth;",
+                res -> {
+                    var resultAuthToken = res.getString(1);
+                    var resultUsername = res.getString(2);
+                    assertEquals(newAuth.authToken(), resultAuthToken);
+                    assertEquals(newAuth.username(), resultUsername);
+                }
+        );
+    }
 
+    @Test
+    void authDaoCreateNullAuthTest() {
+        AuthData newAuth = new AuthData(null, "Batman");
+        assertThrows(DataAccessException.class, () -> authDao.createAuth(newAuth));
+    }
+
+    @Test
+    void authDaoGetAuthTest() throws DataAccessException, SQLException {
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "1", "Gandalf");
+        assertEquals("Gandalf", authDao.getAuth("1").username());
+    }
+
+    @Test
+    void authDaoGetNullAuthTest() {
+        assertThrows(DataAccessException.class, () -> authDao.getAuth(null));
+    }
+
+    @Test
+    void authDaoDeleteAuthTest() throws SQLException, DataAccessException {
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "1", "Gandalf");
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "2", "Frodo");
+        authDao.deleteAuth("1");
+        executeSelect("SELECT username from auth", (res -> {
+            var resultUsername = res.getString(1);
+            assertEquals("Frodo", resultUsername);
+            assertFalse(res.next());
+        }));
+    }
+
+    @Test
+    void authDaoDeleteNullTokenTest() {
+        assertThrows(DataAccessException.class, () -> authDao.deleteAuth(null));
+    }
+
+    @Test
+    void authDaoClearTest() throws SQLException, DataAccessException {
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "1", "Gandalf");
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "2", "Frodo");
+        executeUpdate("INSERT INTO auth (authToken, username) VALUES (?, ?);",
+                "2", "Sam");
+
+        authDao.clear();
+        executeSelect("SELECT username FROM auth", res -> {
+            assertFalse(res.next());
+        });
+    }
 }

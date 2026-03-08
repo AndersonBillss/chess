@@ -29,6 +29,9 @@ public class MySqlAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(String token) throws DataAccessException {
+        if(token == null) {
+            throw new DataAccessException("Token cannot be null");
+        }
         var statement = "SELECT authToken, username FROM auth WHERE authToken=?;";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -50,6 +53,9 @@ public class MySqlAuthDAO implements AuthDAO {
 
     @Override
     public void deleteAuth(String token) throws DataAccessException {
+        if(token == null) {
+            throw new DataAccessException("Token cannot be null");
+        }
         var statement = "DELETE FROM auth where authToken=?;";
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
