@@ -46,6 +46,9 @@ public class MySqlGameDAO implements GameDAO {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        if(gameID < 1) {
+            throw new DataAccessException("Game ID cannot be less than 1");
+        }
         var statement = "SELECT " +
                 "id, whiteUsername, blackUsername, gameName, game " +
                 "FROM games WHERE id=?;";

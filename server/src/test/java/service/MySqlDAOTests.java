@@ -1,6 +1,6 @@
 package service;
 
-import chess.ChessGame;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import static java.sql.Types.NULL;
 import static org.junit.jupiter.api.Assertions.*;
@@ -228,10 +229,213 @@ public class MySqlDAOTests {
         String gameJson = gson.toJson(game);
         executeUpdate(
                 "INSERT INTO games" +
+                        "(id, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?, ?);",
+                1, null, null, "TestGame", gameJson);
+
+        assertEquals("TestGame", gameDao.getGame(1).gameName());
+    }
+
+    @Test
+    void gameDaoGetGameNegativeIdTest() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        String gameJson = gson.toJson(game);
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(id, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?, ?);",
+                1, null, null, "TestGame", gameJson);
+
+        assertEquals("TestGame", gameDao.getGame(1).gameName());
+        assertThrows(DataAccessException.class, () -> gameDao.getGame(-1));
+    }
+
+    @Test
+    void gameDaoEditGameTest() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(
+                0,
+                null,
+                null,
+                "TestGame",
+                game);
+        String gameJson = gson.toJson(game);
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                "TestGame",
+                gameJson);
+
+        GameData newGameData = new GameData(
+                1,
+                "Player1",
+                "Player2",
+                "TestGame1",
+                game
+        );
+
+        gameDao.editGame(newGameData);
+
+        executeSelect(
+                "SELECT whiteUsername, blackUsername, gameName FROM games",
+                res -> {
+                    var whiteUsername = res.getString(1);
+                    var blackUsername = res.getString(2);
+                    var gameName = res.getString(3);
+
+                    assertEquals(newGameData.whiteUsername(), whiteUsername);
+                    assertEquals(newGameData.blackUsername(), blackUsername);
+                    assertEquals(newGameData.gameName(), gameName);
+                }
+        );
+    }
+
+    @Test
+    void gameDaoEditGameState() throws SQLException, DataAccessException, InvalidMoveException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(
+                0,
+                null,
+                null,
+                "TestGame",
+                game);
+        String gameJson = gson.toJson(game);
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(id, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?, ?);",
+                1,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                "TestGame",
+                gameJson);
+
+        ChessBoard board = new ChessBoard();
+        board.addPiece(
+                new ChessPosition(1, 1),
+                new ChessPiece(
+                        ChessGame.TeamColor.BLACK,
+                        ChessPiece.PieceType.PAWN
+                )
+        );
+        game.setBoard(board);
+        GameData newGameData = new GameData(
+                1,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                game
+        );
+
+        gameDao.editGame(newGameData);
+
+        executeSelect(
+                "SELECT game FROM games WHERE id = ?",
+                res -> {
+                    var editedGameJson = res.getString(1);
+                    ChessGame editedGame = gson.fromJson(editedGameJson, ChessGame.class);
+                    assertNotNull(editedGame.getBoard().getPiece(
+                            new ChessPosition(1, 1)
+                    ));
+                },
+                1
+        );
+    }
+
+    @Test
+    void gameDaoEditGameNullGameName() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(
+                0,
+                null,
+                null,
+                "TestGame",
+                game);
+        String gameJson = gson.toJson(game);
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(id, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?, ?);",
+                1,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                "TestGame",
+                gameJson);
+
+        GameData newGameData = new GameData(
+                1,
+                null,
+                null,
+                null,
+                game
+        );
+
+        assertThrows(DataAccessException.class, () -> gameDao.editGame(newGameData));
+    }
+
+    @Test
+    void gameDaoGetGamesTest() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        String gameJson = gson.toJson(game);
+
+        executeUpdate(
+                "INSERT INTO games" +
                         "(whiteUsername, blackUsername, gameName, game) " +
                         "VALUES (?, ?, ?, ?);",
                 null, null, "TestGame", gameJson);
 
-        assertEquals("TestGame", gameDao.getGame(1).gameName());
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame2", gameJson);
+
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame3", gameJson);
+
+        Collection<GameData> allGames = gameDao.getGames();
+        assertEquals(3, allGames.size());
+    }
+
+    @Test
+    void gameDaoClearGamesTest() throws SQLException, DataAccessException {
+        var gson = new Gson();
+        ChessGame game = new ChessGame();
+        String gameJson = gson.toJson(game);
+
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame", gameJson);
+
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame2", gameJson);
+
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?);",
+                null, null, "TestGame3", gameJson);
+
+        gameDao.clear();
+
+        executeSelect("SELECT gameName FROM games", res -> {
+            assertFalse(res.next());
+        });
     }
 }

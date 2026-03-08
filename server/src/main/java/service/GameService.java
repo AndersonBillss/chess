@@ -53,7 +53,9 @@ public class GameService {
         if (!Objects.equals(req.playerColor(), "BLACK") && !Objects.equals(req.playerColor(), "WHITE")) {
             throw new BadRequestException();
         }
-
+        if(req.gameID() < 1) {
+            throw new BadRequestException();
+        }
         var session = authDao.getAuth(authToken);
         if (session == null) {
             throw new UnauthorizedException();
