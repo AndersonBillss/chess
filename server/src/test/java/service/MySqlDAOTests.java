@@ -28,19 +28,23 @@ public class MySqlDAOTests {
         void onSelect(ResultSet res) throws SQLException;
     }
 
+    static void applyParams(PreparedStatement ps, Object... params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            Object param = params[i];
+            if (param instanceof String p) {
+                ps.setString(i + 1, p);
+            } else if (param instanceof Integer p) {
+                ps.setInt(i + 1, p);
+            } else if (param == null) {
+                ps.setNull(i + 1, NULL);
+            }
+        }
+    }
+
     static void executeSelect(String query, SelectCB cb, Object... params) throws DataAccessException, SQLException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
-                }
+                applyParams(ps, params);
                 var resultSet = ps.executeQuery();
                 resultSet.next();
                 cb.onSelect(resultSet);
@@ -51,16 +55,7 @@ public class MySqlDAOTests {
     static void executeUpdate(String query, Object... params) throws DataAccessException, SQLException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
-                }
+                applyParams(ps, params);
                 ps.executeUpdate();
             }
         }
@@ -295,6 +290,20 @@ public class MySqlDAOTests {
         );
     }
 
+    private void addGame(GameData data) throws SQLException, DataAccessException {
+        var gson = new Gson();
+        String gameJson = gson.toJson(data.game());
+        executeUpdate(
+                "INSERT INTO games" +
+                        "(id, whiteUsername, blackUsername, gameName, game) " +
+                        "VALUES (?, ?, ?, ?, ?);",
+                1,
+                data.whiteUsername(),
+                data.blackUsername(),
+                "TestGame",
+                gameJson);
+    }
+
     @Test
     void gameDaoEditGameState() throws SQLException, DataAccessException, InvalidMoveException {
         var gson = new Gson();
@@ -305,17 +314,7 @@ public class MySqlDAOTests {
                 null,
                 "TestGame",
                 game);
-        String gameJson = gson.toJson(game);
-        executeUpdate(
-                "INSERT INTO games" +
-                        "(id, whiteUsername, blackUsername, gameName, game) " +
-                        "VALUES (?, ?, ?, ?, ?);",
-                1,
-                gameData.whiteUsername(),
-                gameData.blackUsername(),
-                "TestGame",
-                gameJson);
-
+        addGame(gameData);
         ChessBoard board = new ChessBoard();
         board.addPiece(
                 new ChessPosition(1, 1),
@@ -350,7 +349,6 @@ public class MySqlDAOTests {
 
     @Test
     void gameDaoEditGameNullGameName() throws SQLException, DataAccessException {
-        var gson = new Gson();
         ChessGame game = new ChessGame();
         GameData gameData = new GameData(
                 0,
@@ -358,16 +356,7 @@ public class MySqlDAOTests {
                 null,
                 "TestGame",
                 game);
-        String gameJson = gson.toJson(game);
-        executeUpdate(
-                "INSERT INTO games" +
-                        "(id, whiteUsername, blackUsername, gameName, game) " +
-                        "VALUES (?, ?, ?, ?, ?);",
-                1,
-                gameData.whiteUsername(),
-                gameData.blackUsername(),
-                "TestGame",
-                gameJson);
+        addGame(gameData);
 
         GameData newGameData = new GameData(
                 1,
@@ -380,8 +369,7 @@ public class MySqlDAOTests {
         assertThrows(DataAccessException.class, () -> gameDao.editGame(newGameData));
     }
 
-    @Test
-    void gameDaoGetGamesTest() throws SQLException, DataAccessException {
+    private void seedGames() throws SQLException, DataAccessException {
         var gson = new Gson();
         ChessGame game = new ChessGame();
         String gameJson = gson.toJson(game);
@@ -403,34 +391,18 @@ public class MySqlDAOTests {
                         "(whiteUsername, blackUsername, gameName, game) " +
                         "VALUES (?, ?, ?, ?);",
                 null, null, "TestGame3", gameJson);
+    }
 
+    @Test
+    void gameDaoGetGamesTest() throws SQLException, DataAccessException {
+        seedGames();
         Collection<GameData> allGames = gameDao.getGames();
         assertEquals(3, allGames.size());
     }
 
     @Test
     void gameDaoClearGamesTest() throws SQLException, DataAccessException {
-        var gson = new Gson();
-        ChessGame game = new ChessGame();
-        String gameJson = gson.toJson(game);
-
-        executeUpdate(
-                "INSERT INTO games" +
-                        "(whiteUsername, blackUsername, gameName, game) " +
-                        "VALUES (?, ?, ?, ?);",
-                null, null, "TestGame", gameJson);
-
-        executeUpdate(
-                "INSERT INTO games" +
-                        "(whiteUsername, blackUsername, gameName, game) " +
-                        "VALUES (?, ?, ?, ?);",
-                null, null, "TestGame2", gameJson);
-
-        executeUpdate(
-                "INSERT INTO games" +
-                        "(whiteUsername, blackUsername, gameName, game) " +
-                        "VALUES (?, ?, ?, ?);",
-                null, null, "TestGame3", gameJson);
+        seedGames();
 
         gameDao.clear();
 

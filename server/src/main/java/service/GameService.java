@@ -94,8 +94,4 @@ public class GameService {
 
         gameDAO.editGame(newGame);
     }
-
-    public int generateGameId() {
-        return gameId++;
-    }
 }
