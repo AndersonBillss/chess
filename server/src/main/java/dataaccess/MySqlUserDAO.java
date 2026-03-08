@@ -59,7 +59,7 @@ public class MySqlUserDAO implements UserDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException(
-                    String.format("Unable to get user: %s%n", e.getMessage())
+                    String.format("Unable to delete users: %s%n", e.getMessage())
             );
         }
     }

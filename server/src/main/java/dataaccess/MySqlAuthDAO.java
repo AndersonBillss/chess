@@ -72,7 +72,7 @@ public class MySqlAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException(
-                    String.format("Unable to get user: %s%n", e.getMessage())
+                    String.format("Unable to delete auth: %s%n", e.getMessage())
             );
         }
     }
