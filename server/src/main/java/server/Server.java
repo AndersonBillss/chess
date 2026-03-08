@@ -41,7 +41,15 @@ public class Server {
             System.exit(1);
             return;
         }
-        var gameDao = new MemoryGameDAO();
+
+        GameDAO gameDao;
+        try {
+            gameDao = new MySqlGameDAO();
+        } catch (DataAccessException e) {
+            System.err.printf("Error creating game DAO: %s%n", e.getMessage());
+            System.exit(1);
+            return;
+        }
 
         var userService = new UserService(authDao, userDao);
         var authService = new AuthService(authDao, userDao);
