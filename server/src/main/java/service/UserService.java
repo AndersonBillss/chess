@@ -5,6 +5,7 @@ import dto.RegisterRequest;
 import dto.RegisterResult;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final AuthDAO authDao;
@@ -19,7 +20,8 @@ public class UserService {
         if (req.username() == null || req.password() == null || req.email() == null) {
             throw new BadRequestException();
         }
-        UserData newUser = new UserData(req.username(), req.password(), req.email());
+        String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt());
+        UserData newUser = new UserData(req.username(), hashedPassword, req.email());
         var existingUser = userDAO.getUser(req.username());
         if (existingUser != null) {
             throw new AlreadyTakenException();

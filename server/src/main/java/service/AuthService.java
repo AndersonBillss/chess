@@ -4,8 +4,7 @@ import dataaccess.*;
 import dto.LoginRequest;
 import dto.LoginResult;
 import model.AuthData;
-
-import java.util.Objects;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
     private final AuthDAO authDao;
@@ -29,7 +28,7 @@ public class AuthService {
         if (existingSession != null) {
             throw new UnauthorizedException();
         }
-        if (!Objects.equals(existingUser.password(), req.password())) {
+        if (!BCrypt.checkpw(req.password(), existingUser.password())) {
             throw new UnauthorizedException();
         }
         String token = ServiceUtils.generateToken();
