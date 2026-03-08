@@ -1,4 +1,4 @@
-package service.dataaccess;
+package dataaccess;
 
 import chess.*;
 import com.google.gson.Gson;
