@@ -4,6 +4,7 @@ import dataaccess.*;
 import dto.LoginRequest;
 import dto.LoginResult;
 import model.AuthData;
+import org.junit.jupiter.api.BeforeAll;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
