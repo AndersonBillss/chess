@@ -48,4 +48,10 @@ public class ServerFacadeTests {
         Assertions.assertNotNull(result.authToken());
     }
 
+    @Test
+    void registerFailure() throws ResponseException {
+        RegisterRequest req = new RegisterRequest("Test", "Test", "Test");
+        serverFacade.Register(req);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Register(req));
+    }
 }
