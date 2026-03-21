@@ -6,6 +6,7 @@ import dataaccess.MySqlUserDAO;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
+import model.UserData;
 import server.Server;
 import server.ServerFacade;
 import org.junit.jupiter.api.*;
@@ -58,13 +59,22 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void loginSuccess() throws ResponseException {
+    void loginSuccess() throws ResponseException, DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
         serverFacade.Register(registerRequest);
         serverFacade.Logout();
+        userDao.createUser(new UserData("Test", "Password", "Test"));
         LoginRequest loginRequest = new LoginRequest("Test", "Password");
         var result = serverFacade.Login(loginRequest);
         Assertions.assertEquals(result.username(), "Test");
         Assertions.assertNotNull(result.authToken());
+    }
+
+    @Test
+    void loginFailure() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+        LoginRequest loginRequest = new LoginRequest("Test", "Password");
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Login(loginRequest));
     }
 }
