@@ -1,6 +1,7 @@
 import chess.ChessGame;
 import dataaccess.*;
 import dto.CreateGameRequest;
+import dto.JoinGameRequest;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
@@ -135,5 +136,40 @@ public class ServerFacadeTests {
 
         var createGameRequest = new CreateGameRequest(null);
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.CreateGame(createGameRequest));
+    }
+
+    @Test
+    void joinGameSuccess() throws DataAccessException, ResponseException {
+        var game1 = new GameData(1,
+                null,
+                null,
+                "Test Game 1",
+                new ChessGame());
+        int gameId = gameDao.createGame(game1);
+
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", gameId);
+        serverFacade.JoinGame(joinGameRequest);
+
+        var joinedGame = gameDao.getGame(gameId);
+        Assertions.assertEquals("Test", joinedGame.whiteUsername());
+    }
+
+    @Test
+    void joinGameFailure() throws ResponseException, DataAccessException {
+        var game1 = new GameData(1,
+                null,
+                null,
+                "Test Game 1",
+                new ChessGame());
+        int gameId = gameDao.createGame(game1);
+
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+
+        JoinGameRequest joinGameRequest = new JoinGameRequest("Invalid Color", gameId);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.JoinGame(joinGameRequest));
     }
 }
