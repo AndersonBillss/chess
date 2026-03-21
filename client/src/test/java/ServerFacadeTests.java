@@ -1,11 +1,9 @@
-import com.mysql.cj.log.Log;
-import dataaccess.DataAccessException;
-import dataaccess.MySqlAuthDAO;
-import dataaccess.MySqlGameDAO;
-import dataaccess.MySqlUserDAO;
+import chess.ChessGame;
+import dataaccess.*;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
+import model.GameData;
 import model.UserData;
 import server.Server;
 import server.ServerFacade;
@@ -88,5 +86,32 @@ public class ServerFacadeTests {
     @Test
     void logoutFailure() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.Logout());
+    }
+
+    @Test
+    void listGamesSuccess() throws DataAccessException, ResponseException {
+        var game1 = new GameData(1,
+                null,
+                null,
+                "Test Game 1",
+                new ChessGame());
+        gameDao.createGame(game1);
+        var game2 = new GameData(1,
+                null,
+                null,
+                "Test Game 2",
+                new ChessGame());
+        gameDao.createGame(game2);
+
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+
+        var games = serverFacade.ListGames();
+        Assertions.assertEquals(2, games.games().size());
+    }
+
+    @Test
+    void listGamesFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.ListGames());
     }
 }
