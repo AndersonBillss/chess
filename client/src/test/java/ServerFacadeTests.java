@@ -1,5 +1,6 @@
 import chess.ChessGame;
 import dataaccess.*;
+import dto.CreateGameRequest;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
@@ -113,5 +114,26 @@ public class ServerFacadeTests {
     @Test
     void listGamesFailure() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.ListGames());
+    }
+
+    @Test
+    void createGameTest() throws ResponseException, DataAccessException {
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+
+        var createGameRequest = new CreateGameRequest("MyGame");
+        var res = serverFacade.CreateGame(createGameRequest);
+
+        var game = gameDao.getGame(res.gameID());
+        Assertions.assertEquals("MyGame", game.gameName());
+    }
+
+    @Test
+    void createGameFailure() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+
+        var createGameRequest = new CreateGameRequest(null);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.CreateGame(createGameRequest));
     }
 }
