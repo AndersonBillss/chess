@@ -77,4 +77,16 @@ public class ServerFacadeTests {
         LoginRequest loginRequest = new LoginRequest("Test", "Password");
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.Login(loginRequest));
     }
+
+    @Test
+    void logoutSuccess() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+        Assertions.assertDoesNotThrow(() -> serverFacade.Logout());
+    }
+
+    @Test
+    void logoutFailure() {
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Logout());
+    }
 }
