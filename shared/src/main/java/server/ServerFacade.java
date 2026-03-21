@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dto.CreateGameRequest;
 import dto.CreateGameResult;
+import dto.ListGamesResult;
 import exception.ResponseException;
 
 import java.net.URI;
@@ -18,13 +19,19 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public ListGamesResult ListGames() throws ResponseException {
+        var path = "/game";
+        var request = buildRequest("POST", path, null);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
     public CreateGameResult CreateGame(CreateGameRequest req) throws ResponseException {
         var path = "/game";
         var request = buildRequest("POST", path, req);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
-
 
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
