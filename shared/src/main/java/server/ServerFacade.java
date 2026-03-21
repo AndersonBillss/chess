@@ -17,6 +17,13 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public RegisterResult Register(RegisterRequest req) throws ResponseException {
+        var path = "/user";
+        var request = buildRequest("POST", path, req);
+        var response = sendRequest(request);
+        return handleResponse(response, RegisterResult.class);
+    }
+
     public LoginResult Login(LoginRequest req) throws ResponseException {
         var path = "/session";
         var request = buildRequest("POST", path, req);
