@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dto.CreateGameRequest;
-import dto.CreateGameResult;
-import dto.JoinGameRequest;
-import dto.ListGamesResult;
+import dto.*;
 import exception.ResponseException;
 
 import java.net.URI;
@@ -18,6 +15,20 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+    }
+
+    public LoginResult Login(LoginRequest req) throws ResponseException {
+        var path = "/session";
+        var request = buildRequest("POST", path, req);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
+    }
+
+    public void Logout() throws ResponseException {
+        var path = "/session";
+        var request = buildRequest("DELETE", path, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public ListGamesResult ListGames() throws ResponseException {
@@ -34,7 +45,7 @@ public class ServerFacade {
         return handleResponse(response, CreateGameResult.class);
     }
 
-    public void JoinGame(JoinGameRequest req) throws  ResponseException {
+    public void JoinGame(JoinGameRequest req) throws ResponseException {
         var path = "/game";
         var request = buildRequest("PUT", path, req);
         var response = sendRequest(request);
