@@ -1,7 +1,9 @@
+import com.mysql.cj.log.Log;
 import dataaccess.DataAccessException;
 import dataaccess.MySqlAuthDAO;
 import dataaccess.MySqlGameDAO;
 import dataaccess.MySqlUserDAO;
+import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
 import server.Server;
@@ -53,5 +55,16 @@ public class ServerFacadeTests {
         RegisterRequest req = new RegisterRequest("Test", "Test", "Test");
         serverFacade.Register(req);
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.Register(req));
+    }
+
+    @Test
+    void loginSuccess() throws ResponseException {
+        RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
+        serverFacade.Register(registerRequest);
+        serverFacade.Logout();
+        LoginRequest loginRequest = new LoginRequest("Test", "Password");
+        var result = serverFacade.Login(loginRequest);
+        Assertions.assertEquals(result.username(), "Test");
+        Assertions.assertNotNull(result.authToken());
     }
 }
