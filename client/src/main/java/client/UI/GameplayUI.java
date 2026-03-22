@@ -18,11 +18,17 @@ public class GameplayUI implements UI {
     ) {
         this.facade = facade;
         this.mode = mode;
+        this.game = game;
     }
 
     @Override
     public String pageIndicator() {
-        return "IN GAME";
+        String modeString = switch (this.mode) {
+            case OBSERVER -> "Observing";
+            case PLAYER -> "Playing";
+        };
+
+        return String.format("%s: %s", modeString, game.gameName());
     }
 
     @Override
