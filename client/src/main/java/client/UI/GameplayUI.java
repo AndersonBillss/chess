@@ -24,7 +24,7 @@ public class GameplayUI implements UI {
         this.facade = facade;
         this.mode = mode;
         this.game = game;
-        printBoard();
+        printBoard(ChessGame.TeamColor.WHITE);
     }
 
     @Override
@@ -68,15 +68,17 @@ public class GameplayUI implements UI {
         }
     }
 
-    private void printBoard() {
-        String borderEsc = String.format("%s%s",
+    private void printBoard(ChessGame.TeamColor color) {
+        String borderEsc = String.format("%s%s%s",
                 EscapeSequences.SET_BG_COLOR_GREEN,
-                EscapeSequences.SET_TEXT_COLOR_BLACK);
+                EscapeSequences.SET_TEXT_COLOR_BLACK,
+                EscapeSequences.SET_TEXT_BOLD);
         String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-        String resetEsc = String.format("%s%s",
+        String resetEsc = String.format("%s%s%s",
                 EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.RESET_BG_COLOR);
+                EscapeSequences.RESET_BG_COLOR,
+                EscapeSequences.RESET_TEXT_BOLD_FAINT);
         String borderRow = String.format(
                 "%s  %sa %sb %sc %sd %se %sf %sg %sh     %s",
                 borderEsc,
@@ -90,16 +92,36 @@ public class GameplayUI implements UI {
                 EscapeSequences.EMPTY,
                 resetEsc
         );
-        System.out.println(borderRow);
+        String borderRowReverse = String.format(
+                "%s  %sh %sg %sf %se %sd %sc %sb %sa     %s",
+                borderEsc,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                EscapeSequences.EMPTY,
+                resetEsc
+        );
+        if (color == ChessGame.TeamColor.WHITE) {
+            System.out.println(borderRow);
+        } else {
+            System.out.println(borderRowReverse);
+        }
 
         ChessBoard board = game.game().getBoard();
         for (int i = 0; i < 16; i++) {
             boolean onRowTop = i % 2 == 0;
             int row = i / 2;
+            if (color == ChessGame.TeamColor.WHITE) {
+                row = 8 - row - 1;
+            }
             String borderCell = String.format(
                     "%s %d %s",
                     borderEsc,
-                    row,
+                    row + 1,
                     resetEsc
             );
             if (onRowTop) {
