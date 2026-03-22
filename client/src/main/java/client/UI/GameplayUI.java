@@ -2,7 +2,7 @@ package client.UI;
 
 public class GameplayUI implements UI {
     @Override
-    public UI takeInput(String input) {
+    public UI handleInput(String input) {
         return this;
     }
 }

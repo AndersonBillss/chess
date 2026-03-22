@@ -1,6 +1,8 @@
 package client;
 
 import chess.*;
+import client.UI.*;
+import server.ServerFacade;
 
 public class ClientMain {
     public static void main(String[] args) {
@@ -9,6 +11,16 @@ public class ClientMain {
 
         PromptManager promptManager = new PromptManager();
         promptManager.takeInput();
+
+        var serverFacade = new ServerFacade("http://localhost:3000");
+        UI currUI = new PreloginUI(serverFacade, promptManager);
+
+        while (true) {
+            if (currUI == null) {
+                return;
+            }
+            currUI = currUI.handleInput(promptManager.takeInput());
+        }
     }
 
 }

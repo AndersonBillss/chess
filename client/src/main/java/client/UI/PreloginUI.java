@@ -6,13 +6,15 @@ import server.ServerFacade;
 public class PreloginUI implements UI {
 
     private ServerFacade facade;
+    private PromptManager promptManager;
 
-    public PreloginUI(ServerFacade facade, PromptManager manager) {
+    public PreloginUI(ServerFacade facade, PromptManager promptManager) {
         this.facade = facade;
+        this.promptManager = promptManager;
     }
 
     @Override
-    public UI takeInput(String input) {
+    public UI handleInput(String input) {
         return switch (input.toLowerCase()) {
             case "help" -> help();
             case "quit" -> quit();
@@ -28,7 +30,6 @@ public class PreloginUI implements UI {
 
     private UI quit() {
         System.out.println("Goodbye!");
-        System.exit(0);
         return null;
     }
 
