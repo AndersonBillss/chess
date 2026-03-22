@@ -1,6 +1,7 @@
 package client.UI;
 
 import client.PromptManager;
+import exception.ResponseException;
 import server.ServerFacade;
 
 public class PostloginUI implements UI {
@@ -31,7 +32,12 @@ public class PostloginUI implements UI {
     }
 
     private UI logout() {
-        return this;
+        try {
+            facade.Logout();
+        } catch (ResponseException ignored) {
+        }
+        promptManager.setLoggedIn(false);
+        return new PreloginUI(facade, promptManager);
     }
 
     private UI create(String[] input) {
