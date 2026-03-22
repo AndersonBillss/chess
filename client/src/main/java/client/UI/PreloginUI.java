@@ -30,7 +30,10 @@ public class PreloginUI implements UI {
     }
 
     private UI help() {
-        System.out.println("HERE IS SOME HELP");
+        System.out.println("  register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
+        System.out.println("  login <USERNAME> <PASSWORD> - to play chess");
+        System.out.println("  quit - playing chess");
+        System.out.println("  help - with possible commands\n");
         return this;
     }
 
