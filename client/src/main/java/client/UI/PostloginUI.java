@@ -5,6 +5,8 @@ import dto.CreateGameRequest;
 import exception.ResponseException;
 import server.ServerFacade;
 
+import java.io.Console;
+
 public class PostloginUI implements UI {
     private ServerFacade facade;
     private PromptManager promptManager;
@@ -20,7 +22,7 @@ public class PostloginUI implements UI {
             case "help" -> help();
             case "logout" -> logout();
             case "create" -> create(input);
-            case "list" -> list(input);
+            case "list" -> list();
             case "play" -> play(input);
             case "observe" -> observe(input);
             default -> this;
@@ -57,7 +59,19 @@ public class PostloginUI implements UI {
         return this;
     }
 
-    private UI list(String[] input) {
+    private UI list() {
+        try {
+            var games = facade.ListGames().games();
+            System.out.println("Games:");
+            for (var game : games) {
+                System.out.printf("  \"%s\": White: \"%s\", \"Black\" %s%n",
+                        game.gameName(),
+                        game.whiteUsername() == null ? "None" : game.whiteUsername(),
+                        game.blackUsername() == null ? "None" : game.blackUsername());
+            }
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+        }
         return this;
     }
 
