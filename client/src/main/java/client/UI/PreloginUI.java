@@ -5,6 +5,8 @@ import dto.RegisterRequest;
 import exception.ResponseException;
 import server.ServerFacade;
 
+import java.io.Console;
+
 public class PreloginUI implements UI {
 
     private ServerFacade facade;
@@ -30,10 +32,10 @@ public class PreloginUI implements UI {
     }
 
     private UI help() {
-        System.out.println("  register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-        System.out.println("  login <USERNAME> <PASSWORD> - to play chess");
-        System.out.println("  quit - playing chess");
-        System.out.println("  help - with possible commands\n");
+        System.out.println("  Register new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>");
+        System.out.println("  Login as existing user: \"login\" <USERNAME> <PASSWORD>");
+        System.out.println("  Exit the program: \"quit\"");
+        System.out.println("  Print this message: \"help\"\n");
         return this;
     }
 
@@ -56,6 +58,7 @@ public class PreloginUI implements UI {
             return this;
         }
 
+        System.out.println("Successfully logged in.");
         return new PostloginUI(facade);
     }
 
@@ -73,6 +76,7 @@ public class PreloginUI implements UI {
             return this;
         }
 
+        System.out.println("Successfully registered.");
         return new PostloginUI(facade);
     }
 }

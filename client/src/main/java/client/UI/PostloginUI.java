@@ -1,6 +1,5 @@
 package client.UI;
 
-import client.PromptManager;
 import dto.CreateGameRequest;
 import dto.JoinGameRequest;
 import exception.ResponseException;
@@ -38,12 +37,12 @@ public class PostloginUI implements UI {
     }
 
     private UI help() {
-        System.out.println("  create <NAME> - a game");
-        System.out.println("  list - games");
-        System.out.println("  join <ID> [WHITE|BLACK] - a game");
-        System.out.println("  observe <ID> - a game");
-        System.out.println("  logout - when you are done");
-        System.out.println("  help - with possible commands\n");
+        System.out.println("  List current games: \"list\"");
+        System.out.println("  Create a new game: \"create\" <NAME>");
+        System.out.println("  Join a game: \"join\" <ID> [WHITE|BLACK]");
+        System.out.println("  Observe a game: \"observe\" <ID> - a game");
+        System.out.println("  Logout: \"logout\"");
+        System.out.println("  Print this message: \"help\"\n");
         return this;
     }
 
@@ -77,7 +76,7 @@ public class PostloginUI implements UI {
             System.out.println("Games:");
             for (int i = 0; i < games.size(); i++) {
                 var game = games.get(i);
-                System.out.printf("  %d - \"%s\": White: \"%s\", \"Black\" %s%n",
+                System.out.printf("  %d. game name: %s    White: %s    Black: %s%n",
                         i + 1,
                         game.gameName(),
                         game.whiteUsername() == null ? "None" : game.whiteUsername(),
@@ -137,6 +136,7 @@ public class PostloginUI implements UI {
             return this;
         }
 
+        System.out.println("Successfully joined game.");
         return new GameplayUI(facade, GameplayUI.Mode.PLAYER, gameData);
     }
 
