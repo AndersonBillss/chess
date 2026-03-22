@@ -1,6 +1,7 @@
 package client.UI;
 
 import client.PromptManager;
+import dto.CreateGameRequest;
 import exception.ResponseException;
 import server.ServerFacade;
 
@@ -41,6 +42,18 @@ public class PostloginUI implements UI {
     }
 
     private UI create(String[] input) {
+        if (input.length != 2) {
+            System.out.println("Create requires 1 additional argument:" +
+                    " <NAME>");
+            return this;
+        }
+        var req = new CreateGameRequest(input[1]);
+        try {
+            facade.CreateGame(req);
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+            return this;
+        }
         return this;
     }
 
