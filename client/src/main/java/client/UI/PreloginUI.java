@@ -39,7 +39,7 @@ public class PreloginUI implements UI {
 
     private UI login(String[] input) {
         if (input.length != 3) {
-            System.out.println("Login requires 2 additional arguments:" +
+            System.out.println("Login requires 2 arguments:" +
                     " <USERNAME>, <PASSWORD>");
             return this;
         }
@@ -57,7 +57,7 @@ public class PreloginUI implements UI {
 
     private UI register(String[] input) {
         if (input.length != 4) {
-            System.out.println("Register requires 3 additional arguments:" +
+            System.out.println("Register requires 3 arguments:" +
                     " <USERNAME>, <PASSWORD>, <EMAIL>");
             return this;
         }
