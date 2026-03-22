@@ -14,8 +14,8 @@ public class PreloginUI implements UI {
     }
 
     @Override
-    public UI handleInput(String input) {
-        return switch (input.toLowerCase()) {
+    public UI handleInput(String[] input) {
+        return switch (input[0].toLowerCase()) {
             case "help" -> help();
             case "quit" -> quit();
             case "login" -> login();
@@ -25,6 +25,7 @@ public class PreloginUI implements UI {
     }
 
     private UI help() {
+        System.out.println("HERE IS SOME HELP");
         return this;
     }
 

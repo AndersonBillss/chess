@@ -1,5 +1,7 @@
 package client.UI;
 
+import java.util.List;
+
 public interface UI {
-    public UI handleInput(String input);
+    UI handleInput(String[] input);
 }

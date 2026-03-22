@@ -10,17 +10,12 @@ public class ClientMain {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         PromptManager promptManager = new PromptManager();
-        promptManager.takeInput();
+        ServerFacade serverFacade = new ServerFacade("http://localhost:3000");
 
-        var serverFacade = new ServerFacade("http://localhost:3000");
         UI currUI = new PreloginUI(serverFacade, promptManager);
 
-        while (true) {
-            if (currUI == null) {
-                return;
-            }
+        while (currUI != null) {
             currUI = currUI.handleInput(promptManager.takeInput());
         }
     }
-
 }
