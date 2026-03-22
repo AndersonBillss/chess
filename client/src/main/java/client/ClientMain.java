@@ -10,7 +10,7 @@ public class ClientMain {
         System.out.println("♕ 240 Chess Client: " + piece);
 
         PromptManager promptManager = new PromptManager();
-        ServerFacade serverFacade = new ServerFacade("http://localhost:3000");
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
         UI currUI = new PreloginUI(serverFacade, promptManager);
 

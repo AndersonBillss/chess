@@ -1,6 +1,8 @@
 package client.UI;
 
 import client.PromptManager;
+import dto.LoginRequest;
+import exception.ResponseException;
 import server.ServerFacade;
 
 public class PreloginUI implements UI {
@@ -18,7 +20,7 @@ public class PreloginUI implements UI {
         return switch (input[0].toLowerCase()) {
             case "help" -> help();
             case "quit" -> quit();
-            case "login" -> login();
+            case "login" -> login(input);
             case "register" -> register();
             default -> this;
         };
@@ -34,8 +36,21 @@ public class PreloginUI implements UI {
         return null;
     }
 
-    private UI login() {
-        return this;
+    private UI login(String[] input) {
+        if (input.length != 3) {
+            System.out.println("Login requires 2 additional arguments:" +
+                    " <USERNAME>, <PASSWORD>");
+        }
+        LoginRequest req = new LoginRequest(input[0], input[1]);
+        try {
+            facade.Login(req);
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+            return this;
+        }
+
+        promptManager.setLoggedIn(true);
+        return new PostloginUI(facade, promptManager);
     }
 
     private UI register() {
