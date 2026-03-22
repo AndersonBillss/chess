@@ -1,6 +1,9 @@
 package client.UI;
 
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
 import ui.EscapeSequences;
@@ -39,17 +42,44 @@ public class GameplayUI implements UI {
         return this;
     }
 
+    private void printCell(ChessPiece piece) {
+        if (piece == null) {
+            System.out.print(EscapeSequences.EMPTY);
+        } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            String esc = switch (piece.getPieceType()) {
+                case ChessPiece.PieceType.PAWN -> EscapeSequences.BLACK_PAWN;
+                case ChessPiece.PieceType.ROOK -> EscapeSequences.BLACK_ROOK;
+                case ChessPiece.PieceType.KNIGHT -> EscapeSequences.BLACK_KNIGHT;
+                case ChessPiece.PieceType.BISHOP -> EscapeSequences.BLACK_BISHOP;
+                case ChessPiece.PieceType.KING -> EscapeSequences.BLACK_KING;
+                case ChessPiece.PieceType.QUEEN -> EscapeSequences.BLACK_QUEEN;
+            };
+            System.out.printf("%s%s", EscapeSequences.SET_TEXT_COLOR_BLACK, esc);
+        } else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            String esc = switch (piece.getPieceType()) {
+                case ChessPiece.PieceType.PAWN -> EscapeSequences.WHITE_PAWN;
+                case ChessPiece.PieceType.ROOK -> EscapeSequences.WHITE_ROOK;
+                case ChessPiece.PieceType.KNIGHT -> EscapeSequences.WHITE_KNIGHT;
+                case ChessPiece.PieceType.BISHOP -> EscapeSequences.WHITE_BISHOP;
+                case ChessPiece.PieceType.KING -> EscapeSequences.WHITE_KING;
+                case ChessPiece.PieceType.QUEEN -> EscapeSequences.WHITE_QUEEN;
+            };
+            System.out.printf("%s%s", EscapeSequences.SET_TEXT_COLOR_WHITE, esc);
+        }
+    }
+
     private void printBoard() {
-        String borderColorEsc = EscapeSequences.SET_BG_COLOR_GREEN;
-        String borderTextEsc = EscapeSequences.SET_TEXT_COLOR_BLACK;
-        String borderEsc = String.format("%s%s", borderColorEsc, borderTextEsc);
+        String borderEsc = String.format("%s%s",
+                EscapeSequences.SET_BG_COLOR_GREEN,
+                EscapeSequences.SET_TEXT_COLOR_BLACK);
+        String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
         String resetEsc = String.format("%s%s",
                 EscapeSequences.RESET_TEXT_COLOR,
                 EscapeSequences.RESET_BG_COLOR);
         String borderRow = String.format(
-                "%s%sa%sb%sc%sd%se%sf%sg%sh%s%s",
+                "%s  %sa %sb %sc %sd %se %sf %sg %sh     %s",
                 borderEsc,
-                EscapeSequences.EMPTY,
                 EscapeSequences.EMPTY,
                 EscapeSequences.EMPTY,
                 EscapeSequences.EMPTY,
@@ -62,16 +92,37 @@ public class GameplayUI implements UI {
         );
         System.out.println(borderRow);
 
-        for (int i = 0; i < 8; i++) {
+        ChessBoard board = game.game().getBoard();
+        for (int i = 0; i < 16; i++) {
+            boolean onRowTop = i % 2 == 0;
+            int row = i / 2;
             String borderCell = String.format(
                     "%s %d %s",
                     borderEsc,
-                    i,
+                    row,
                     resetEsc
             );
+            if (onRowTop) {
+                borderCell = String.format(
+                        "%s   %s",
+                        borderEsc,
+                        resetEsc);
+            }
             System.out.print(borderCell);
-            for (int j = 1; j < 8; j++) {
-
+            for (int j = 0; j < 8; j++) {
+                int col = j;
+                int rowPattern = row % 2 == 0 ? 1 : -1;
+                int colPattern = col % 2 == 0 ? 1 : -1;
+                boolean isWhiteCell = rowPattern * colPattern == 1;
+                String cellEsc = isWhiteCell ? cellWhiteEsc : cellBlackEsc;
+                System.out.printf("%s ", cellEsc);
+                ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
+                if (onRowTop) {
+                    System.out.print(EscapeSequences.EMPTY);
+                } else {
+                    printCell(piece);
+                }
+                System.out.print(" ");
             }
             System.out.println(borderCell);
         }
