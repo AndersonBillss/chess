@@ -5,8 +5,6 @@ import dto.RegisterRequest;
 import exception.ResponseException;
 import server.ServerFacade;
 
-import java.io.Console;
-
 public class PreloginUI implements UI {
 
     private ServerFacade facade;
@@ -27,7 +25,7 @@ public class PreloginUI implements UI {
             case "quit" -> quit();
             case "login" -> login(input);
             case "register" -> register(input);
-            default -> this;
+            default -> unknownCommand(input);
         };
     }
 
@@ -78,5 +76,10 @@ public class PreloginUI implements UI {
 
         System.out.println("Successfully registered.");
         return new PostloginUI(facade);
+    }
+
+    private UI unknownCommand(String[] input) {
+        System.out.printf("Unknown command: %s\n", input[0]);
+        return this;
     }
 }

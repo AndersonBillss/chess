@@ -32,7 +32,7 @@ public class PostloginUI implements UI {
             case "list" -> list();
             case "join" -> join(input);
             case "observe" -> observe(input);
-            default -> this;
+            default -> unknownCommand(input);
         };
     }
 
@@ -152,5 +152,10 @@ public class PostloginUI implements UI {
         }
 
         return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameData);
+    }
+
+    private UI unknownCommand(String[] input) {
+        System.out.printf("Unknown command: %s\n", input[0]);
+        return this;
     }
 }
