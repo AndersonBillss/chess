@@ -12,10 +12,10 @@ public class ClientMain {
         PromptManager promptManager = new PromptManager();
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
-        UI currUI = new PreloginUI(serverFacade, promptManager);
+        UI currUI = new PreloginUI(serverFacade);
 
         while (currUI != null) {
-            currUI = currUI.handleInput(promptManager.takeInput());
+            currUI = promptManager.takeInput(currUI);
         }
     }
 }

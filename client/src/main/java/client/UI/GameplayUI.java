@@ -10,17 +10,20 @@ public class GameplayUI implements UI {
     }
 
     private ServerFacade facade;
-    private PromptManager promptManager;
     private Mode mode;
     private int gameId;
 
     public GameplayUI(
-            ServerFacade facade, PromptManager promptManager, Mode mode, int gameId
+            ServerFacade facade, Mode mode, int gameId
     ) {
         this.facade = facade;
-        this.promptManager = promptManager;
         this.mode = mode;
         this.gameId = gameId;
+    }
+
+    @Override
+    public String pageIndicator() {
+        return "IN GAME";
     }
 
     @Override

@@ -7,7 +7,6 @@ import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -15,11 +14,14 @@ import static java.lang.Integer.parseInt;
 
 public class PostloginUI implements UI {
     private ServerFacade facade;
-    private PromptManager promptManager;
 
-    public PostloginUI(ServerFacade facade, PromptManager promptManager) {
+    public PostloginUI(ServerFacade facade) {
         this.facade = facade;
-        this.promptManager = promptManager;
+    }
+
+    @Override
+    public String pageIndicator() {
+        return "Logged in";
     }
 
     @Override
@@ -45,8 +47,7 @@ public class PostloginUI implements UI {
             facade.Logout();
         } catch (ResponseException ignored) {
         }
-        promptManager.setLoggedIn(false);
-        return new PreloginUI(facade, promptManager);
+        return new PreloginUI(facade);
     }
 
     private UI create(String[] input) {
@@ -131,7 +132,7 @@ public class PostloginUI implements UI {
             return this;
         }
 
-        return new GameplayUI(facade, promptManager, GameplayUI.Mode.PLAYER, gameId);
+        return new GameplayUI(facade, GameplayUI.Mode.PLAYER, gameId);
     }
 
     private UI observe(String[] input) {
@@ -145,6 +146,6 @@ public class PostloginUI implements UI {
             return this;
         }
 
-        return new GameplayUI(facade, promptManager, GameplayUI.Mode.OBSERVER, gameId);
+        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameId);
     }
 }

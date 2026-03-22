@@ -1,6 +1,5 @@
 package client.UI;
 
-import client.PromptManager;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
@@ -9,11 +8,14 @@ import server.ServerFacade;
 public class PreloginUI implements UI {
 
     private ServerFacade facade;
-    private PromptManager promptManager;
 
-    public PreloginUI(ServerFacade facade, PromptManager promptManager) {
+    public PreloginUI(ServerFacade facade) {
         this.facade = facade;
-        this.promptManager = promptManager;
+    }
+
+    @Override
+    public String pageIndicator() {
+        return "Logged out";
     }
 
     @Override
@@ -51,8 +53,7 @@ public class PreloginUI implements UI {
             return this;
         }
 
-        promptManager.setLoggedIn(true);
-        return new PostloginUI(facade, promptManager);
+        return new PostloginUI(facade);
     }
 
     private UI register(String[] input) {
@@ -69,7 +70,6 @@ public class PreloginUI implements UI {
             return this;
         }
 
-        promptManager.setLoggedIn(true);
-        return new PostloginUI(facade, promptManager);
+        return new PostloginUI(facade);
     }
 }
