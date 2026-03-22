@@ -2,13 +2,14 @@ package client.UI;
 
 import client.PromptManager;
 import dto.CreateGameRequest;
+import dto.JoinGameRequest;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 
 import java.io.Console;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
@@ -82,37 +83,68 @@ public class PostloginUI implements UI {
         return this;
     }
 
-    private UI join(String[] input) {
-        if (input.length != 2) {
-            System.out.println("Join requires one argument: <ID>");
-            return this;
-        }
-
+    private int getGameId(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
             games = new ArrayList<>(facade.ListGames().games());
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return this;
+            return -1;
         }
         int gameIndex;
         try {
-            gameIndex = parseInt(input[1].trim());
+            gameIndex = parseInt(gameIndexStr.trim()) - 1;
         } catch (NumberFormatException e) {
             System.out.println("Invalid number");
+            return -1;
+        }
+
+        if (gameIndex > games.size() || gameIndex < 0) {
+            System.out.printf("Game does not exist: %d\n", gameIndex + 1);
+            return -1;
+        }
+
+        return games.get(gameIndex).gameID();
+    }
+
+    private UI join(String[] input) {
+        if (input.length != 3) {
+            System.out.println("Join requires two arguments: <ID>, [WHITE|BLACK]");
+            return this;
+        }
+        int gameId = getGameId(input[1]);
+        if (gameId == -1) {
             return this;
         }
 
-        if (gameIndex > games.size()) {
-            System.out.printf("Game does not exist: %d\n", gameIndex);
+        String color = input[2].trim().toUpperCase();
+        if (!Objects.equals(color, "WHITE") && !Objects.equals(color, "BLACK")) {
+            System.out.println("Color must be black or white");
             return this;
         }
 
-        int gameId = games.get(gameIndex).gameID();
+        try {
+            JoinGameRequest req = new JoinGameRequest(color, gameId);
+            facade.JoinGame(req);
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+            return this;
+        }
+
         return new GameplayUI(facade, promptManager, GameplayUI.Mode.PLAYER, gameId);
     }
 
     private UI observe(String[] input) {
-        return this;
+        if (input.length != 2) {
+            System.out.println("Join requires one argument: <ID>");
+            return this;
+        }
+
+        int gameId = getGameId(input[1]);
+        if (gameId == -1) {
+            return this;
+        }
+
+        return new GameplayUI(facade, promptManager, GameplayUI.Mode.OBSERVER, gameId);
     }
 }
