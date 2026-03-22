@@ -84,28 +84,28 @@ public class PostloginUI implements UI {
         return this;
     }
 
-    private int getGameId(String gameIndexStr) {
+    private GameData getGameId(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
             games = new ArrayList<>(facade.ListGames().games());
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return -1;
+            return null;
         }
         int gameIndex;
         try {
             gameIndex = parseInt(gameIndexStr.trim()) - 1;
         } catch (NumberFormatException e) {
             System.out.println("Invalid number");
-            return -1;
+            return null;
         }
 
         if (gameIndex > games.size() || gameIndex < 0) {
             System.out.printf("Game does not exist: %d\n", gameIndex + 1);
-            return -1;
+            return null;
         }
 
-        return games.get(gameIndex).gameID();
+        return games.get(gameIndex);
     }
 
     private UI join(String[] input) {
@@ -113,8 +113,8 @@ public class PostloginUI implements UI {
             System.out.println("Join requires two arguments: <ID>, [WHITE|BLACK]");
             return this;
         }
-        int gameId = getGameId(input[1]);
-        if (gameId == -1) {
+        GameData gameData = getGameId(input[1]);
+        if (gameData == null) {
             return this;
         }
 
@@ -125,14 +125,14 @@ public class PostloginUI implements UI {
         }
 
         try {
-            JoinGameRequest req = new JoinGameRequest(color, gameId);
+            JoinGameRequest req = new JoinGameRequest(color, gameData.gameID());
             facade.JoinGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
         }
 
-        return new GameplayUI(facade, GameplayUI.Mode.PLAYER, gameId);
+        return new GameplayUI(facade, GameplayUI.Mode.PLAYER, gameData);
     }
 
     private UI observe(String[] input) {
@@ -141,11 +141,11 @@ public class PostloginUI implements UI {
             return this;
         }
 
-        int gameId = getGameId(input[1]);
-        if (gameId == -1) {
+        GameData gameData = getGameId(input[1]);
+        if (gameData == null) {
             return this;
         }
 
-        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameId);
+        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameData);
     }
 }

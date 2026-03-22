@@ -1,6 +1,6 @@
 package client.UI;
 
-import client.PromptManager;
+import model.GameData;
 import server.ServerFacade;
 
 public class GameplayUI implements UI {
@@ -11,14 +11,13 @@ public class GameplayUI implements UI {
 
     private ServerFacade facade;
     private Mode mode;
-    private int gameId;
+    private GameData game;
 
     public GameplayUI(
-            ServerFacade facade, Mode mode, int gameId
+            ServerFacade facade, Mode mode, GameData game
     ) {
         this.facade = facade;
         this.mode = mode;
-        this.gameId = gameId;
     }
 
     @Override
