@@ -2,6 +2,7 @@ package client.UI;
 
 import client.PromptManager;
 import dto.LoginRequest;
+import dto.RegisterRequest;
 import exception.ResponseException;
 import server.ServerFacade;
 
@@ -21,7 +22,7 @@ public class PreloginUI implements UI {
             case "help" -> help();
             case "quit" -> quit();
             case "login" -> login(input);
-            case "register" -> register();
+            case "register" -> register(input);
             default -> this;
         };
     }
@@ -40,8 +41,9 @@ public class PreloginUI implements UI {
         if (input.length != 3) {
             System.out.println("Login requires 2 additional arguments:" +
                     " <USERNAME>, <PASSWORD>");
+            return this;
         }
-        LoginRequest req = new LoginRequest(input[0], input[1]);
+        LoginRequest req = new LoginRequest(input[1], input[2]);
         try {
             facade.Login(req);
         } catch (ResponseException e) {
@@ -53,7 +55,21 @@ public class PreloginUI implements UI {
         return new PostloginUI(facade, promptManager);
     }
 
-    private UI register() {
-        return this;
+    private UI register(String[] input) {
+        if (input.length != 4) {
+            System.out.println("Register requires 3 additional arguments:" +
+                    " <USERNAME>, <PASSWORD>, <EMAIL>");
+            return this;
+        }
+        RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
+        try {
+            facade.Register(req);
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
+            return this;
+        }
+
+        promptManager.setLoggedIn(true);
+        return new PostloginUI(facade, promptManager);
     }
 }
