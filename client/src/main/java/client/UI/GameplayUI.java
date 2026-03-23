@@ -8,6 +8,8 @@ import model.GameData;
 import server.ServerFacade;
 import ui.EscapeSequences;
 
+import java.util.Objects;
+
 public class GameplayUI implements UI {
     public enum Mode {
         OBSERVER,
@@ -17,14 +19,30 @@ public class GameplayUI implements UI {
     private ServerFacade facade;
     private Mode mode;
     private GameData game;
+    private String username;
 
     public GameplayUI(
-            ServerFacade facade, Mode mode, GameData game
+            ServerFacade facade, Mode mode, GameData game, String username
     ) {
         this.facade = facade;
         this.mode = mode;
         this.game = game;
-        printBoard(ChessGame.TeamColor.WHITE);
+        this.username = username;
+
+        printBoard(getColor());
+    }
+
+    public ChessGame.TeamColor getColor() {
+        if (mode == Mode.OBSERVER) {
+            return ChessGame.TeamColor.WHITE;
+        }
+        if (Objects.equals(username, game.whiteUsername())) {
+            return ChessGame.TeamColor.WHITE;
+        }
+        if (Objects.equals(username, game.blackUsername())) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        return ChessGame.TeamColor.WHITE;
     }
 
     @Override
@@ -133,9 +151,12 @@ public class GameplayUI implements UI {
             System.out.print(borderCell);
             for (int j = 0; j < 8; j++) {
                 int col = j;
+                if (color == ChessGame.TeamColor.BLACK) {
+                    col = 8 - col - 1;
+                }
                 int rowPattern = row % 2 == 0 ? 1 : -1;
                 int colPattern = col % 2 == 0 ? 1 : -1;
-                boolean isWhiteCell = rowPattern * colPattern == 1;
+                boolean isWhiteCell = rowPattern * colPattern == -1;
                 String cellEsc = isWhiteCell ? cellWhiteEsc : cellBlackEsc;
                 System.out.printf("%s ", cellEsc);
                 ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));

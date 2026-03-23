@@ -2,12 +2,13 @@ package client.UI;
 
 import dto.LoginRequest;
 import dto.RegisterRequest;
+import dto.RegisterResult;
 import exception.ResponseException;
 import server.ServerFacade;
 
 public class PreloginUI implements UI {
 
-    private ServerFacade facade;
+    private final ServerFacade facade;
 
     public PreloginUI(ServerFacade facade) {
         this.facade = facade;
@@ -49,15 +50,16 @@ public class PreloginUI implements UI {
             return this;
         }
         LoginRequest req = new LoginRequest(input[1], input[2]);
+        String username;
         try {
-            facade.Login(req);
+            username = facade.Login(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
         }
 
         System.out.println("Successfully logged in.");
-        return new PostloginUI(facade);
+        return new PostloginUI(facade, username);
     }
 
     private UI register(String[] input) {
@@ -67,15 +69,16 @@ public class PreloginUI implements UI {
             return this;
         }
         RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
+        String username;
         try {
-            facade.Register(req);
+            username = facade.Register(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
         }
 
         System.out.println("Successfully registered.");
-        return new PostloginUI(facade);
+        return new PostloginUI(facade, username);
     }
 
     private UI unknownCommand(String[] input) {

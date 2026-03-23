@@ -12,10 +12,12 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 
 public class PostloginUI implements UI {
-    private ServerFacade facade;
+    private final ServerFacade facade;
+    private final String username;
 
-    public PostloginUI(ServerFacade facade) {
+    public PostloginUI(ServerFacade facade, String username) {
         this.facade = facade;
+        this.username = username;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class PostloginUI implements UI {
         return this;
     }
 
-    private GameData getGameId(String gameIndexStr) {
+    private GameData getGameFromInput(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
             games = new ArrayList<>(facade.ListGames().games());
@@ -117,7 +119,7 @@ public class PostloginUI implements UI {
             System.out.println("Join requires two arguments: <ID>, [WHITE|BLACK]");
             return this;
         }
-        GameData gameData = getGameId(input[1]);
+        GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
             return this;
         }
@@ -137,7 +139,11 @@ public class PostloginUI implements UI {
         }
 
         System.out.println("Successfully joined game.");
-        return new GameplayUI(facade, GameplayUI.Mode.PLAYER, gameData);
+        return new GameplayUI(
+                facade,
+                GameplayUI.Mode.PLAYER,
+                getGameFromInput(input[1]),
+                username);
     }
 
     private UI observe(String[] input) {
@@ -146,12 +152,12 @@ public class PostloginUI implements UI {
             return this;
         }
 
-        GameData gameData = getGameId(input[1]);
+        GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
             return this;
         }
 
-        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameData);
+        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameData, username);
     }
 
     private UI unknownCommand(String[] input) {
