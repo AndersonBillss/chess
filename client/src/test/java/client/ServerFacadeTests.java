@@ -1,3 +1,5 @@
+package client;
+
 import chess.ChessGame;
 import dataaccess.*;
 import dto.CreateGameRequest;
