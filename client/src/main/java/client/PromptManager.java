@@ -1,6 +1,6 @@
 package client;
 
-import client.UI.UI;
+import client.ui.UI;
 
 import java.util.Scanner;
 

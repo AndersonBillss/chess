@@ -18,7 +18,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult Register(RegisterRequest req) throws ResponseException {
+    public RegisterResult register(RegisterRequest req) throws ResponseException {
         var path = "/user";
         var request = buildRequest("POST", path, req);
         var response = sendRequest(request);
@@ -27,7 +27,7 @@ public class ServerFacade {
         return responseData;
     }
 
-    public LoginResult Login(LoginRequest req) throws ResponseException {
+    public LoginResult login(LoginRequest req) throws ResponseException {
         var path = "/session";
         var request = buildRequest("POST", path, req);
         var response = sendRequest(request);
@@ -36,7 +36,7 @@ public class ServerFacade {
         return responseData;
     }
 
-    public void Logout() throws ResponseException {
+    public void logout() throws ResponseException {
         var path = "/session";
         var request = buildRequest("DELETE", path, null);
         var response = sendRequest(request);
@@ -44,21 +44,21 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public ListGamesResult ListGames() throws ResponseException {
+    public ListGamesResult listGames() throws ResponseException {
         var path = "/game";
         var request = buildRequest("GET", path, null);
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
 
-    public CreateGameResult CreateGame(CreateGameRequest req) throws ResponseException {
+    public CreateGameResult createGame(CreateGameRequest req) throws ResponseException {
         var path = "/game";
         var request = buildRequest("POST", path, req);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
 
-    public void JoinGame(JoinGameRequest req) throws ResponseException {
+    public void joinGame(JoinGameRequest req) throws ResponseException {
         var path = "/game";
         var request = buildRequest("PUT", path, req);
         var response = sendRequest(request);

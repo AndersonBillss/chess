@@ -1,4 +1,4 @@
-package client.UI;
+package client.ui;
 
 public interface UI {
     String pageIndicator();

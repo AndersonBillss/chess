@@ -1,8 +1,7 @@
-package client.UI;
+package client.ui;
 
 import dto.LoginRequest;
 import dto.RegisterRequest;
-import dto.RegisterResult;
 import exception.ResponseException;
 import server.ServerFacade;
 
@@ -52,7 +51,7 @@ public class PreloginUI implements UI {
         LoginRequest req = new LoginRequest(input[1], input[2]);
         String username;
         try {
-            username = facade.Login(req).username();
+            username = facade.login(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -71,7 +70,7 @@ public class PreloginUI implements UI {
         RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
         String username;
         try {
-            username = facade.Register(req).username();
+            username = facade.register(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;

@@ -46,7 +46,7 @@ public class ServerFacadeTests {
     @Test
     void registerSuccess() throws ResponseException {
         RegisterRequest req = new RegisterRequest("Test", "Test", "Test");
-        var result = serverFacade.Register(req);
+        var result = serverFacade.register(req);
         Assertions.assertEquals(result.username(), "Test");
         Assertions.assertNotNull(result.authToken());
     }
@@ -54,18 +54,18 @@ public class ServerFacadeTests {
     @Test
     void registerFailure() throws ResponseException {
         RegisterRequest req = new RegisterRequest("Test", "Test", "Test");
-        serverFacade.Register(req);
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Register(req));
+        serverFacade.register(req);
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.register(req));
     }
 
     @Test
     void loginSuccess() throws ResponseException, DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
-        serverFacade.Logout();
+        serverFacade.register(registerRequest);
+        serverFacade.logout();
         userDao.createUser(new UserData("Test", "Password", "Test"));
         LoginRequest loginRequest = new LoginRequest("Test", "Password");
-        var result = serverFacade.Login(loginRequest);
+        var result = serverFacade.login(loginRequest);
         Assertions.assertEquals(result.username(), "Test");
         Assertions.assertNotNull(result.authToken());
     }
@@ -73,21 +73,21 @@ public class ServerFacadeTests {
     @Test
     void loginFailure() throws ResponseException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
         LoginRequest loginRequest = new LoginRequest("Test", "Password");
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Login(loginRequest));
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.login(loginRequest));
     }
 
     @Test
     void logoutSuccess() throws ResponseException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
-        Assertions.assertDoesNotThrow(() -> serverFacade.Logout());
+        serverFacade.register(registerRequest);
+        Assertions.assertDoesNotThrow(() -> serverFacade.logout());
     }
 
     @Test
     void logoutFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.Logout());
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.logout());
     }
 
     @Test
@@ -106,24 +106,24 @@ public class ServerFacadeTests {
         gameDao.createGame(game2);
 
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
 
-        var games = serverFacade.ListGames();
+        var games = serverFacade.listGames();
         Assertions.assertEquals(2, games.games().size());
     }
 
     @Test
     void listGamesFailure() {
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.ListGames());
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.listGames());
     }
 
     @Test
     void createGameTest() throws ResponseException, DataAccessException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
 
         var createGameRequest = new CreateGameRequest("MyGame");
-        var res = serverFacade.CreateGame(createGameRequest);
+        var res = serverFacade.createGame(createGameRequest);
 
         var game = gameDao.getGame(res.gameID());
         Assertions.assertEquals("MyGame", game.gameName());
@@ -132,10 +132,10 @@ public class ServerFacadeTests {
     @Test
     void createGameFailure() throws ResponseException {
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
 
         var createGameRequest = new CreateGameRequest(null);
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.CreateGame(createGameRequest));
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.createGame(createGameRequest));
     }
 
     @Test
@@ -148,10 +148,10 @@ public class ServerFacadeTests {
         int gameId = gameDao.createGame(game1);
 
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", gameId);
-        serverFacade.JoinGame(joinGameRequest);
+        serverFacade.joinGame(joinGameRequest);
 
         var joinedGame = gameDao.getGame(gameId);
         Assertions.assertEquals("Test", joinedGame.whiteUsername());
@@ -167,9 +167,9 @@ public class ServerFacadeTests {
         int gameId = gameDao.createGame(game1);
 
         RegisterRequest registerRequest = new RegisterRequest("Test", "Password", "Test");
-        serverFacade.Register(registerRequest);
+        serverFacade.register(registerRequest);
 
         JoinGameRequest joinGameRequest = new JoinGameRequest("Invalid Color", gameId);
-        Assertions.assertThrows(ResponseException.class, () -> serverFacade.JoinGame(joinGameRequest));
+        Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame(joinGameRequest));
     }
 }

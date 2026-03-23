@@ -1,4 +1,4 @@
-package client.UI;
+package client.ui;
 
 import dto.CreateGameRequest;
 import dto.JoinGameRequest;
@@ -50,7 +50,7 @@ public class PostloginUI implements UI {
 
     private UI logout() {
         try {
-            facade.Logout();
+            facade.logout();
         } catch (ResponseException ignored) {
         }
         return new PreloginUI(facade);
@@ -64,7 +64,7 @@ public class PostloginUI implements UI {
         }
         var req = new CreateGameRequest(input[1]);
         try {
-            facade.CreateGame(req);
+            facade.createGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -74,7 +74,7 @@ public class PostloginUI implements UI {
 
     private UI list() {
         try {
-            var games = new ArrayList<>(facade.ListGames().games());
+            var games = new ArrayList<>(facade.listGames().games());
             System.out.println("Games:");
             for (int i = 0; i < games.size(); i++) {
                 var game = games.get(i);
@@ -93,7 +93,7 @@ public class PostloginUI implements UI {
     private GameData getGameFromInput(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
-            games = new ArrayList<>(facade.ListGames().games());
+            games = new ArrayList<>(facade.listGames().games());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -132,7 +132,7 @@ public class PostloginUI implements UI {
 
         try {
             JoinGameRequest req = new JoinGameRequest(color, gameData.gameID());
-            facade.JoinGame(req);
+            facade.joinGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;

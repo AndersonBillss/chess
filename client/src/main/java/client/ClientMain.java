@@ -1,7 +1,7 @@
 package client;
 
 import chess.*;
-import client.UI.*;
+import client.ui.*;
 import server.ServerFacade;
 
 public class ClientMain {
