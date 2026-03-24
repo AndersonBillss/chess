@@ -1,5 +1,6 @@
 package client.ui;
 
+import chess.ChessGame;
 import dto.CreateGameRequest;
 import dto.JoinGameRequest;
 import exception.ResponseException;
@@ -138,12 +139,15 @@ public class PostloginUI implements UI {
             return this;
         }
 
+        ChessGame.TeamColor teamColor = Objects.equals(color, "BLACK") ? ChessGame.TeamColor.BLACK
+                : ChessGame.TeamColor.WHITE;
         System.out.println("Successfully joined game.");
         return new GameplayUI(
                 facade,
                 GameplayUI.Mode.PLAYER,
                 getGameFromInput(input[1]),
-                username);
+                username,
+                teamColor);
     }
 
     private UI observe(String[] input) {

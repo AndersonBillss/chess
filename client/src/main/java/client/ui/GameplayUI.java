@@ -20,6 +20,7 @@ public class GameplayUI implements UI {
     private Mode mode;
     private GameData game;
     private String username;
+    private ChessGame.TeamColor color;
 
     public GameplayUI(
             ServerFacade facade, Mode mode, GameData game, String username
@@ -32,7 +33,19 @@ public class GameplayUI implements UI {
         printBoard(getColor());
     }
 
+    public GameplayUI(
+            ServerFacade facade, Mode mode, GameData game, String username, ChessGame.TeamColor color
+    ) {
+        this(facade, mode, game, username);
+        this.color = color;
+
+        printBoard(getColor());
+    }
+
     public ChessGame.TeamColor getColor() {
+        if (color != null) {
+            return color;
+        }
         if (mode == Mode.OBSERVER) {
             return ChessGame.TeamColor.WHITE;
         }
@@ -170,7 +183,11 @@ public class GameplayUI implements UI {
             System.out.println(borderCell);
         }
 
-        System.out.println(borderRow);
+        if (color == ChessGame.TeamColor.WHITE) {
+            System.out.println(borderRow);
+        } else {
+            System.out.println(borderRowReverse);
+        }
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
         System.out.print(EscapeSequences.RESET_BG_COLOR);
     }
