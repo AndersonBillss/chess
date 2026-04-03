@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import handlers.*;
 import io.javalin.*;
+import handlers.websocket.WebSocketHandler;
 import service.AuthService;
 import service.DBService;
 import service.GameService;
@@ -59,6 +60,8 @@ public class Server {
         var gameHandler = new GameHandler(gameService);
         var dbHandler = new DBHandler(dbService);
 
+        var webSocketHandler = new WebSocketHandler();
+
         // Register your endpoints and exception handlers here.
         javalin
                 .delete("/db", HandlerUtils.handleErr(dbHandler::clear))
@@ -67,7 +70,12 @@ public class Server {
                 .delete("/session", HandlerUtils.handleErr(authHandler::logout))
                 .get("/game", HandlerUtils.handleErr(gameHandler::listGames))
                 .post("/game", HandlerUtils.handleErr(gameHandler::createGame))
-                .put("/game", HandlerUtils.handleErr(gameHandler::joinGame));
+                .put("/game", HandlerUtils.handleErr(gameHandler::joinGame))
+                .ws("/ws", ws -> {
+                    ws.onConnect(webSocketHandler);
+                    ws.onMessage(webSocketHandler);
+                    ws.onClose(webSocketHandler);
+                });
     }
 
     public int run(int desiredPort) {
