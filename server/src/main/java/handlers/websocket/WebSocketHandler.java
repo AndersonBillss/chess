@@ -10,11 +10,11 @@ import websocket.commands.UserGameCommand;
 import java.util.HashSet;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
-    private final HashSet<Session> sessions;
+    private final SessionManager sessions;
     private final GameDAO gameDao;
 
     public WebSocketHandler(GameDAO gameDao) {
-        this.sessions = new HashSet<>();
+        this.sessions = new SessionManager();
         this.gameDao = gameDao;
     }
 
