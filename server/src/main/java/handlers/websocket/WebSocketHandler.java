@@ -1,6 +1,7 @@
 package handlers.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.GameDAO;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
@@ -10,9 +11,11 @@ import java.util.HashSet;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final HashSet<Session> sessions;
+    private final GameDAO gameDao;
 
-    public WebSocketHandler() {
+    public WebSocketHandler(GameDAO gameDao) {
         this.sessions = new HashSet<>();
+        this.gameDao = gameDao;
     }
 
     @Override

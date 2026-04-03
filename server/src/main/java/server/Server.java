@@ -60,7 +60,7 @@ public class Server {
         var gameHandler = new GameHandler(gameService);
         var dbHandler = new DBHandler(dbService);
 
-        var webSocketHandler = new WebSocketHandler();
+        var webSocketHandler = new WebSocketHandler(gameDao);
 
         // Register your endpoints and exception handlers here.
         javalin
