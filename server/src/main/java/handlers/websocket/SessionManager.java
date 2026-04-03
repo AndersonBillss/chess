@@ -3,7 +3,6 @@ package handlers.websocket;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
