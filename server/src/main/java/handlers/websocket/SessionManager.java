@@ -21,4 +21,12 @@ public class SessionManager {
         }
         sessions.add(session);
     }
+
+    public void removeSession(int gameId, Session session) {
+        var sessions = gameSessions.get(gameId);
+        if(sessions == null) {
+            return;
+        }
+        sessions.remove(session);
+    }
 }
