@@ -1,15 +1,18 @@
 package handlers.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
-import java.util.HashSet;
+import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final SessionManager sessions;
@@ -44,11 +47,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void connect(UserGameCommand command, WsMessageContext ctx) {
+    private void connect(UserGameCommand command, WsMessageContext ctx)
+            throws DataAccessException, IOException {
         sessions.addSession(command.getGameID(), ctx.session);
-        ServerMessage serverMessage = new ServerMessage(
-                ServerMessage.ServerMessageType.NOTIFICATION
+        var game = gameDao.getGame(command.getGameID());
+        ServerMessage serverMessage = new LoadGameMessage(
+                game.game()
         );
+        ctx.send(new Gson().toJson(serverMessage));
+        sessions.broadcast(command.getGameID(), ctx.session, "New user joined");
     }
 
     private void makeMove(MakeMoveCommand command, Session session) {
