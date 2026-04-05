@@ -1,12 +1,11 @@
 package client.ui;
 
 import chess.ChessGame;
+import client.UIContext;
 import dto.CreateGameRequest;
 import dto.JoinGameRequest;
 import exception.ResponseException;
 import model.GameData;
-import server.ServerFacade;
-import server.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -14,16 +13,13 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 
 public class PostloginUI implements UI {
-    private final ServerFacade serverFacade;
-    private final WebSocketFacade webSocketFacade;
+    private final UIContext ctx;
     private final String username;
 
     public PostloginUI(
-            ServerFacade serverFacade,
-            WebSocketFacade webSocketFacade,
+            UIContext uiContext,
             String username) {
-        this.serverFacade = serverFacade;
-        this.webSocketFacade = webSocketFacade;
+        this.ctx = uiContext;
         this.username = username;
     }
 
@@ -57,10 +53,10 @@ public class PostloginUI implements UI {
 
     private UI logout() {
         try {
-            serverFacade.logout();
+            ctx.getServerFacade().logout();
         } catch (ResponseException ignored) {
         }
-        return new PreloginUI(serverFacade, webSocketFacade);
+        return new PreloginUI(ctx);
     }
 
     private UI create(String[] input) {
@@ -71,7 +67,7 @@ public class PostloginUI implements UI {
         }
         var req = new CreateGameRequest(input[1]);
         try {
-            serverFacade.createGame(req);
+            ctx.getServerFacade().createGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -81,7 +77,7 @@ public class PostloginUI implements UI {
 
     private UI list() {
         try {
-            var games = new ArrayList<>(serverFacade.listGames().games());
+            var games = new ArrayList<>(ctx.getServerFacade().listGames().games());
             System.out.println("Games:");
             for (int i = 0; i < games.size(); i++) {
                 var game = games.get(i);
@@ -100,7 +96,7 @@ public class PostloginUI implements UI {
     private GameData getGameFromInput(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
-            games = new ArrayList<>(serverFacade.listGames().games());
+            games = new ArrayList<>(ctx.getServerFacade().listGames().games());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -139,7 +135,7 @@ public class PostloginUI implements UI {
 
         try {
             JoinGameRequest req = new JoinGameRequest(color, gameData.gameID());
-            serverFacade.joinGame(req);
+            ctx.getServerFacade().joinGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -149,8 +145,7 @@ public class PostloginUI implements UI {
                 : ChessGame.TeamColor.WHITE;
         System.out.println("Successfully joined game.");
         return new GameplayUI(
-                serverFacade,
-                webSocketFacade,
+                ctx,
                 GameplayUI.Mode.PLAYER,
                 getGameFromInput(input[1]),
                 username,
@@ -169,8 +164,7 @@ public class PostloginUI implements UI {
         }
 
         return new GameplayUI(
-                serverFacade,
-                webSocketFacade,
+                ctx,
                 GameplayUI.Mode.OBSERVER,
                 gameData, username);
     }

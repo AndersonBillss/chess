@@ -25,7 +25,7 @@ public class ClientMain {
                     System.out.println(notification.getMessage());
                 });
 
-        UI currUI = new PreloginUI(serverFacade, socketFacade);
+        UI currUI = new PreloginUI(new UIContext(serverFacade, socketFacade));
 
         while (currUI != null) {
             currUI = promptManager.takeInput(currUI);

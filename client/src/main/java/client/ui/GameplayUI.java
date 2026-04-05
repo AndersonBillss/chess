@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import client.UIContext;
 import model.GameData;
 import server.ServerFacade;
 import server.WebSocketFacade;
@@ -17,30 +18,30 @@ public class GameplayUI implements UI {
         PLAYER,
     }
 
-    private ServerFacade serverFacade;
-    private WebSocketFacade webSocketFacade;
+    private UIContext ctx;
     private Mode mode;
     private GameData game;
     private String username;
     private ChessGame.TeamColor color;
 
     public GameplayUI(
-            ServerFacade serverFacade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username
+            UIContext ctx, Mode mode, GameData game, String username
     ) {
-        this.serverFacade = serverFacade;
-        this.webSocketFacade = webSocketFacade;
+        this.ctx = ctx;
         this.mode = mode;
         this.game = game;
         this.username = username;
 
-        webSocketFacade.joinGame(this.serverFacade.getAuthToken(), game.gameID());
+        this.ctx.getWebSocketFacade().joinGame(
+                this.ctx.getServerFacade().getAuthToken(),
+                game.gameID());
         printBoard(getColor());
     }
 
     public GameplayUI(
-            ServerFacade serverFacade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username, ChessGame.TeamColor color
+            UIContext ctx, Mode mode, GameData game, String username, ChessGame.TeamColor color
     ) {
-        this(serverFacade, webSocketFacade, mode, game, username);
+        this(ctx, mode, game, username);
         this.color = color;
     }
 
