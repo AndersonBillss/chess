@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class SessionManager {
     public final Map<Integer, ArrayList<Session>> gameSessions;
@@ -39,8 +40,9 @@ public class SessionManager {
             return;
         }
         for (var session : sessions) {
-            if (session != excludedSession) {
-                session.getRemote().sendString(new Gson().toJson(new NotificationMessage(message)));
+            if (!Objects.equals(session, excludedSession)) {
+                String response = new Gson().toJson(new NotificationMessage(message));
+                session.getRemote().sendString(response);
             }
         }
     }

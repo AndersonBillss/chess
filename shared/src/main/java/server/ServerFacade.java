@@ -65,6 +65,10 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public String getAuthToken() {
+        return this.authToken;
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))

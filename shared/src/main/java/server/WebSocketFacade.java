@@ -3,8 +3,9 @@ package server;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import jakarta.websocket.*;
-import org.glassfish.tyrus.core.wsadl.model.Endpoint;
+import websocket.commands.UserGameCommand;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,14 +25,42 @@ public class WebSocketFacade extends Endpoint {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
 
-            this.session.addMessageHandler((MessageHandler.Whole<String>) message -> {
-                NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-                notificationHandler.notify(notification);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    var gson = new Gson();
+                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                    switch (serverMessage.getServerMessageType()) {
+                        case LOAD_GAME -> System.out.println("A game is loaded");
+                        case ERROR -> System.out.println("There was an error");
+                        case NOTIFICATION -> {
+                            NotificationMessage notificationMessage = gson.fromJson(
+                                    message,
+                                    NotificationMessage.class
+                            );
+                            notificationHandler.notify(notificationMessage);
+                        }
+                    }
+                }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    //Endpoint requires this method, but you don't have to do anything
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void joinGame(String authToken, int gameId) {
+        try {
+            var command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
         }
     }
 }

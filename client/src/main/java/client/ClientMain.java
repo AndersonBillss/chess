@@ -17,8 +17,10 @@ public class ClientMain {
         PromptManager promptManager = new PromptManager();
 
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
-        WebSocketFacade socketFacade = new WebSocketFacade("http://localhost:8080/ws",
-                System.out::println);
+        WebSocketFacade socketFacade = new WebSocketFacade("http://localhost:8080",
+                (notification) -> {
+                    System.out.println(notification.getMessage());
+                });
 
         UI currUI = new PreloginUI(serverFacade, socketFacade);
 

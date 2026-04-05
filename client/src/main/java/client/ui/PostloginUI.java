@@ -159,7 +159,7 @@ public class PostloginUI implements UI {
 
     private UI observe(String[] input) {
         if (input.length != 2) {
-            System.out.println("Join requires one argument: <ID>");
+            System.out.println("Observe requires one argument: <ID>");
             return this;
         }
 

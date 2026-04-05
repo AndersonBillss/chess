@@ -33,16 +33,15 @@ public class GameplayUI implements UI {
         this.game = game;
         this.username = username;
 
+        webSocketFacade.joinGame(this.serverFacade.getAuthToken(), game.gameID());
         printBoard(getColor());
     }
 
     public GameplayUI(
-            ServerFacade facade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username, ChessGame.TeamColor color
+            ServerFacade serverFacade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username, ChessGame.TeamColor color
     ) {
-        this(facade, webSocketFacade, mode, game, username);
+        this(serverFacade, webSocketFacade, mode, game, username);
         this.color = color;
-
-        printBoard(getColor());
     }
 
     public ChessGame.TeamColor getColor() {
