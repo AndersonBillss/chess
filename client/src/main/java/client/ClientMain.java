@@ -11,10 +11,9 @@ public class ClientMain {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
 
-        PromptManager promptManager = new PromptManager();
 
-        ClientContext clientContext;
-        clientContext = new ClientContext();
+        ClientContext clientContext = new ClientContext();
+        PromptManager promptManager = new PromptManager(new PreloginUI(clientContext));
         clientContext.setServerFacade(new ServerFacade("http://localhost:8080"));
         clientContext.setWebSocketFacade(new WebSocketFacade("http://localhost:8080",
                 (error) -> {
@@ -25,14 +24,16 @@ public class ClientMain {
                     clientContext.setBoard(board);
                     System.out.println();
                     BoardDisplay.show(board, clientContext.getColor());
+                    promptManager.printPrompt();
                 }),
                 (notification) -> {
                     System.out.println(notification.getMessage());
+                    promptManager.printPrompt();
                 }));
-        UI currUI = new PreloginUI(clientContext);
 
-        while (currUI != null) {
-            currUI = promptManager.takeInput(currUI);
+        while (!promptManager.done()) {
+            promptManager.printPrompt();
+            promptManager.takeInput();
         }
     }
 }
