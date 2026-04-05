@@ -47,8 +47,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(UserGameCommand command, WsMessageContext ctx)
             throws DataAccessException, IOException {
-        System.out.println("Client connect!!!");
-        System.out.println(command.getGameID());
         sessions.addSession(command.getGameID(), ctx.session);
         var game = gameDao.getGame(command.getGameID());
         LoadGameMessage serverMessage = new LoadGameMessage(

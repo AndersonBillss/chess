@@ -3,11 +3,8 @@ package client;
 import chess.*;
 import client.ui.*;
 import exception.ResponseException;
-import server.NotificationHandler;
 import server.ServerFacade;
 import server.WebSocketFacade;
-
-import java.io.Console;
 
 public class ClientMain {
     public static void main(String[] args) throws ResponseException {
@@ -18,6 +15,12 @@ public class ClientMain {
 
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         WebSocketFacade socketFacade = new WebSocketFacade("http://localhost:8080",
+                (error) -> {
+                    System.err.println(error.getErrorMessage());
+                },
+                (game -> {
+                    System.out.println("LOAD GAME");
+                }),
                 (notification) -> {
                     System.out.println(notification.getMessage());
                 });
