@@ -4,10 +4,8 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import client.UIContext;
+import client.ClientContext;
 import model.GameData;
-import server.ServerFacade;
-import server.WebSocketFacade;
 import ui.EscapeSequences;
 
 import java.util.Objects;
@@ -18,14 +16,14 @@ public class GameplayUI implements UI {
         PLAYER,
     }
 
-    private UIContext ctx;
+    private ClientContext ctx;
     private Mode mode;
     private GameData game;
     private String username;
     private ChessGame.TeamColor color;
 
     public GameplayUI(
-            UIContext ctx, Mode mode, GameData game, String username
+            ClientContext ctx, Mode mode, GameData game, String username
     ) {
         this.ctx = ctx;
         this.mode = mode;
@@ -39,7 +37,7 @@ public class GameplayUI implements UI {
     }
 
     public GameplayUI(
-            UIContext ctx, Mode mode, GameData game, String username, ChessGame.TeamColor color
+            ClientContext ctx, Mode mode, GameData game, String username, ChessGame.TeamColor color
     ) {
         this(ctx, mode, game, username);
         this.color = color;

@@ -1,14 +1,14 @@
 package client.ui;
 
-import client.UIContext;
+import client.ClientContext;
 import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
 
 public class PreloginUI implements UI {
-    UIContext ctx;
+    ClientContext ctx;
 
-    public PreloginUI(UIContext ctx) {
+    public PreloginUI(ClientContext ctx) {
         this.ctx = ctx;
     }
 

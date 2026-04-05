@@ -1,7 +1,7 @@
 package client.ui;
 
 import chess.ChessGame;
-import client.UIContext;
+import client.ClientContext;
 import dto.CreateGameRequest;
 import dto.JoinGameRequest;
 import exception.ResponseException;
@@ -13,11 +13,11 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 
 public class PostloginUI implements UI {
-    private final UIContext ctx;
+    private final ClientContext ctx;
     private final String username;
 
     public PostloginUI(
-            UIContext uiContext,
+            ClientContext uiContext,
             String username) {
         this.ctx = uiContext;
         this.username = username;

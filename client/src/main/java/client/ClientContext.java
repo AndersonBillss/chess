@@ -3,11 +3,11 @@ package client;
 import server.ServerFacade;
 import server.WebSocketFacade;
 
-public class UIContext {
+public class ClientContext {
     private final ServerFacade serverFacade;
     private final WebSocketFacade webSocketFacade;
 
-    UIContext(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
+    ClientContext(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
         this.serverFacade = serverFacade;
         this.webSocketFacade = webSocketFacade;
     }
