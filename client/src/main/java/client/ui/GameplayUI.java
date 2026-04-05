@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import server.ServerFacade;
+import server.WebSocketFacade;
 import ui.EscapeSequences;
 
 import java.util.Objects;
@@ -16,16 +17,18 @@ public class GameplayUI implements UI {
         PLAYER,
     }
 
-    private ServerFacade facade;
+    private ServerFacade serverFacade;
+    private WebSocketFacade webSocketFacade;
     private Mode mode;
     private GameData game;
     private String username;
     private ChessGame.TeamColor color;
 
     public GameplayUI(
-            ServerFacade facade, Mode mode, GameData game, String username
+            ServerFacade serverFacade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username
     ) {
-        this.facade = facade;
+        this.serverFacade = serverFacade;
+        this.webSocketFacade = webSocketFacade;
         this.mode = mode;
         this.game = game;
         this.username = username;
@@ -34,9 +37,9 @@ public class GameplayUI implements UI {
     }
 
     public GameplayUI(
-            ServerFacade facade, Mode mode, GameData game, String username, ChessGame.TeamColor color
+            ServerFacade facade, WebSocketFacade webSocketFacade, Mode mode, GameData game, String username, ChessGame.TeamColor color
     ) {
-        this(facade, mode, game, username);
+        this(facade, webSocketFacade, mode, game, username);
         this.color = color;
 
         printBoard(getColor());
@@ -70,6 +73,47 @@ public class GameplayUI implements UI {
 
     @Override
     public UI handleInput(String[] input) {
+        return switch (input[0].toLowerCase()) {
+            case "help" -> help();
+            case "leave" -> leave();
+            case "move" -> move();
+            case "resign" -> resign();
+            case "highlight" -> highlight();
+            default -> unknownCommand(input);
+        };
+    }
+
+    private UI help() {
+        System.out.println("  Redraw the board: \"redraw\"");
+        System.out.println("  Leave the game: \"leave\"");
+        System.out.println("  Make a move: \"move\" <START> <END>");
+        System.out.println("  Resign from a game: \"resign\"");
+        System.out.println("  Highlight legal moves: \"highlight\"");
+        return this;
+    }
+
+    private UI leave() {
+        System.out.println("Not implemented!");
+        return this;
+    }
+
+    private UI move() {
+        System.out.println("Not implemented!");
+        return this;
+    }
+
+    private UI resign() {
+        System.out.println("Not implemented!");
+        return this;
+    }
+
+    private UI highlight() {
+        System.out.println("Not implemented!");
+        return this;
+    }
+
+    private UI unknownCommand(String[] input) {
+        System.out.printf("Unknown command: %s\n", input[0]);
         return this;
     }
 

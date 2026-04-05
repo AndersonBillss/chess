@@ -4,13 +4,16 @@ import dto.LoginRequest;
 import dto.RegisterRequest;
 import exception.ResponseException;
 import server.ServerFacade;
+import server.WebSocketFacade;
 
 public class PreloginUI implements UI {
 
-    private final ServerFacade facade;
+    private final ServerFacade serverFacade;
+    private final WebSocketFacade webSocketFacade;
 
-    public PreloginUI(ServerFacade facade) {
-        this.facade = facade;
+    public PreloginUI(ServerFacade serverFacade, WebSocketFacade webSocketFacade) {
+        this.serverFacade = serverFacade;
+        this.webSocketFacade = webSocketFacade;
     }
 
     @Override
@@ -51,14 +54,14 @@ public class PreloginUI implements UI {
         LoginRequest req = new LoginRequest(input[1], input[2]);
         String username;
         try {
-            username = facade.login(req).username();
+            username = serverFacade.login(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
         }
 
         System.out.println("Successfully logged in.");
-        return new PostloginUI(facade, username);
+        return new PostloginUI(serverFacade, webSocketFacade, username);
     }
 
     private UI register(String[] input) {
@@ -70,14 +73,14 @@ public class PreloginUI implements UI {
         RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
         String username;
         try {
-            username = facade.register(req).username();
+            username = serverFacade.register(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
         }
 
         System.out.println("Successfully registered.");
-        return new PostloginUI(facade, username);
+        return new PostloginUI(serverFacade, webSocketFacade, username);
     }
 
     private UI unknownCommand(String[] input) {

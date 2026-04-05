@@ -6,6 +6,7 @@ import dto.JoinGameRequest;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
+import server.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -13,11 +14,16 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 
 public class PostloginUI implements UI {
-    private final ServerFacade facade;
+    private final ServerFacade serverFacade;
+    private final WebSocketFacade webSocketFacade;
     private final String username;
 
-    public PostloginUI(ServerFacade facade, String username) {
-        this.facade = facade;
+    public PostloginUI(
+            ServerFacade serverFacade,
+            WebSocketFacade webSocketFacade,
+            String username) {
+        this.serverFacade = serverFacade;
+        this.webSocketFacade = webSocketFacade;
         this.username = username;
     }
 
@@ -51,10 +57,10 @@ public class PostloginUI implements UI {
 
     private UI logout() {
         try {
-            facade.logout();
+            serverFacade.logout();
         } catch (ResponseException ignored) {
         }
-        return new PreloginUI(facade);
+        return new PreloginUI(serverFacade, webSocketFacade);
     }
 
     private UI create(String[] input) {
@@ -65,7 +71,7 @@ public class PostloginUI implements UI {
         }
         var req = new CreateGameRequest(input[1]);
         try {
-            facade.createGame(req);
+            serverFacade.createGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -75,7 +81,7 @@ public class PostloginUI implements UI {
 
     private UI list() {
         try {
-            var games = new ArrayList<>(facade.listGames().games());
+            var games = new ArrayList<>(serverFacade.listGames().games());
             System.out.println("Games:");
             for (int i = 0; i < games.size(); i++) {
                 var game = games.get(i);
@@ -94,7 +100,7 @@ public class PostloginUI implements UI {
     private GameData getGameFromInput(String gameIndexStr) {
         ArrayList<GameData> games;
         try {
-            games = new ArrayList<>(facade.listGames().games());
+            games = new ArrayList<>(serverFacade.listGames().games());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
@@ -133,7 +139,7 @@ public class PostloginUI implements UI {
 
         try {
             JoinGameRequest req = new JoinGameRequest(color, gameData.gameID());
-            facade.joinGame(req);
+            serverFacade.joinGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
             return this;
@@ -143,7 +149,8 @@ public class PostloginUI implements UI {
                 : ChessGame.TeamColor.WHITE;
         System.out.println("Successfully joined game.");
         return new GameplayUI(
-                facade,
+                serverFacade,
+                webSocketFacade,
                 GameplayUI.Mode.PLAYER,
                 getGameFromInput(input[1]),
                 username,
@@ -161,7 +168,11 @@ public class PostloginUI implements UI {
             return this;
         }
 
-        return new GameplayUI(facade, GameplayUI.Mode.OBSERVER, gameData, username);
+        return new GameplayUI(
+                serverFacade,
+                webSocketFacade,
+                GameplayUI.Mode.OBSERVER,
+                gameData, username);
     }
 
     private UI unknownCommand(String[] input) {
