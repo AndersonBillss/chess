@@ -13,19 +13,23 @@ public class ClientMain {
 
         PromptManager promptManager = new PromptManager();
 
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
-        WebSocketFacade socketFacade = new WebSocketFacade("http://localhost:8080",
+        ClientContext clientContext;
+        clientContext = new ClientContext();
+        clientContext.setServerFacade(new ServerFacade("http://localhost:8080"));
+        clientContext.setWebSocketFacade(new WebSocketFacade("http://localhost:8080",
                 (error) -> {
                     System.err.println(error.getErrorMessage());
                 },
                 (game -> {
-                    System.out.println("LOAD GAME");
+                    var board = game.getGame().getBoard();
+                    clientContext.setBoard(board);
+                    System.out.println();
+                    BoardDisplay.show(board, clientContext.getColor());
                 }),
                 (notification) -> {
                     System.out.println(notification.getMessage());
-                });
-
-        UI currUI = new PreloginUI(new ClientContext(serverFacade, socketFacade));
+                }));
+        UI currUI = new PreloginUI(clientContext);
 
         while (currUI != null) {
             currUI = promptManager.takeInput(currUI);
