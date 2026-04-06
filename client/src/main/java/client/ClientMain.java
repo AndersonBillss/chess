@@ -17,16 +17,18 @@ public class ClientMain {
         clientContext.setServerFacade(new ServerFacade("http://localhost:8080"));
         clientContext.setWebSocketFacade(new WebSocketFacade("http://localhost:8080",
                 (error) -> {
-                    System.err.println(error.getErrorMessage());
+                    System.out.print(error.getErrorMessage());
                     promptManager.printPrompt();
                 },
                 (game -> {
                     var board = game.getGame().game().getBoard();
+                    System.out.println();
                     clientContext.setBoard(board);
                     BoardDisplay.show(board, clientContext.getColor());
                     promptManager.printPrompt();
                 }),
                 (notification) -> {
+                    System.out.println();
                     System.out.println(notification.getMessage());
                     promptManager.printPrompt();
                 }));

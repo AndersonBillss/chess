@@ -7,7 +7,6 @@ import chess.ChessPosition;
 import client.ClientContext;
 import model.GameData;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

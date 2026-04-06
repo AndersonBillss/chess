@@ -39,6 +39,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) throws Exception {
+        ctx.enableAutomaticPings();
     }
 
     @Override
