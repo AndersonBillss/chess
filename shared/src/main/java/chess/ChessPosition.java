@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,7 +26,17 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "{" + row + ", " + col + "}";
+        Map<Integer, String> colToString = Map.of(
+                1, "a",
+                2, "b",
+                3, "c",
+                4, "d",
+                5, "e",
+                6, "f",
+                7, "g",
+                8, "h"
+        );
+        return colToString.get(col) + row;
     }
 
     private int row;
@@ -55,6 +66,7 @@ public class ChessPosition {
     public ChessPosition add(ChessPosition position) {
         return new ChessPosition(row + position.row, col + position.col);
     }
+
     public ChessPosition mul(int n) {
         return new ChessPosition(row * n, col * n);
     }

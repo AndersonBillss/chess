@@ -61,6 +61,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throws DataAccessException, IOException {
         sessions.addSession(command.getGameID(), ctx.session);
         var game = gameDao.getGame(command.getGameID());
+        if (authDao.getAuth(command.getAuthToken()) == null) {
+            throw new WebSocketException("Unauthorized");
+        }
         if (game == null) {
             throw new WebSocketException("Game does not exist");
         }
@@ -93,6 +96,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         gameDao.editGame(game);
 
         sessions.broadcast(game);
+        sessions.broadcast(
+                game.gameID(),
+                session,
+                String.format("%s made move: %s",
+                        user.username(),
+                        command.getMove().toString()
+                )
+        );
     }
 
     private void leave(UserGameCommand command, Session session) {
