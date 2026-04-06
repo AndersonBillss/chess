@@ -60,7 +60,7 @@ public class Server {
         var gameHandler = new GameHandler(gameService);
         var dbHandler = new DBHandler(dbService);
 
-        var webSocketHandler = new WebSocketHandler(gameDao);
+        var webSocketHandler = new WebSocketHandler(gameDao, userDao, authDao);
 
         // Register your endpoints and exception handlers here.
         javalin
@@ -73,7 +73,7 @@ public class Server {
                 .put("/game", HandlerUtils.handleErr(gameHandler::joinGame))
                 .ws("/ws", ws -> {
                     ws.onConnect(webSocketHandler);
-                    ws.onMessage(webSocketHandler);
+                    ws.onMessage(HandlerUtils.handleErrWebsocket(webSocketHandler));
                     ws.onClose(webSocketHandler);
                 });
     }

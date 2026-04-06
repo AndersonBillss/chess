@@ -157,8 +157,11 @@ public class GameplayUI implements UI {
         }
 
         ChessMove move = new ChessMove(pos1, pos2, promotionPiece);
+        ctx.getWebSocketFacade().makeMove(
+                ctx.getServerFacade().getAuthToken(),
+                game.gameID(),
+                move);
 
-        System.out.println("SUCCESS!");
         return this;
     }
 

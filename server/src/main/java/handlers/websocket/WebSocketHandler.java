@@ -1,9 +1,15 @@
 package handlers.websocket;
 
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.websocket.*;
+import model.AuthData;
+import model.UserData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.MakeMoveCommand;
@@ -11,14 +17,19 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final SessionManager sessions;
     private final GameDAO gameDao;
+    private final UserDAO userDao;
+    private final AuthDAO authDao;
 
-    public WebSocketHandler(GameDAO gameDao) {
+    public WebSocketHandler(GameDAO gameDao, UserDAO userDao, AuthDAO authDao) {
         this.sessions = new SessionManager();
         this.gameDao = gameDao;
+        this.userDao = userDao;
+        this.authDao = authDao;
     }
 
     @Override
@@ -32,6 +43,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) throws Exception {
+
         var gson = new Gson();
         UserGameCommand command = gson.fromJson(ctx.message(), UserGameCommand.class);
         switch (command.getCommandType()) {
@@ -57,7 +69,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sessions.broadcast(command.getGameID(), ctx.session, "New user joined");
     }
 
-    private void makeMove(MakeMoveCommand command, Session session) {
+    private void makeMove(MakeMoveCommand command, Session session) throws DataAccessException, InvalidMoveException, IOException {
+        var game = gameDao.getGame(command.getGameID());
+        if (game == null) {
+            throw new WebSocketException("Game not found");
+        }
+        AuthData authData = authDao.getAuth(command.getAuthToken());
+        UserData user = userDao.getUser(authData.username());
+        ChessGame.TeamColor userColor = Objects.equals(game.whiteUsername(), user.username())
+                ? ChessGame.TeamColor.WHITE : Objects.equals(game.blackUsername(), user.username())
+                ? ChessGame.TeamColor.BLACK : null;
+        if (userColor == null) {
+            throw new WebSocketException("Not a player in the game");
+        }
+        if (game.game().getTeamTurn() != userColor) {
+            throw new WebSocketException("Not your turn");
+        }
+
+        game.game().makeMove(command.getMove());
+        gameDao.editGame(game);
+
+        sessions.broadcast(game);
     }
 
     private void leave(UserGameCommand command, Session session) {

@@ -1,15 +1,35 @@
 package handlers;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccessException;
 import dto.ErrorResult;
 import io.javalin.http.Handler;
+import io.javalin.websocket.WsMessageHandler;
 import service.ServiceException;
+import websocket.messages.ErrorMessage;
 
 public class HandlerUtils {
     HandlerUtils() {
+    }
+
+    public static WsMessageHandler handleErrWebsocket(WsMessageHandler handlerFn) {
+        var gson = new Gson();
+        return ctx -> {
+            try {
+                handlerFn.handleMessage(ctx);
+            } catch (DataAccessException e) {
+                ErrorMessage errorMessage = new ErrorMessage(
+                        String.format("Database Error: %s%n", e.getMessage())
+                );
+                ctx.session.getRemote().sendString(gson.toJson(errorMessage));
+            } catch (Exception e) {
+                ErrorMessage errorMessage = new ErrorMessage(
+                        String.format("Error: %s%n", e.getMessage())
+                );
+                ctx.session.getRemote().sendString(gson.toJson(errorMessage));
+            }
+        };
     }
 
     public static Handler handleErr(Handler handlerFn) {
