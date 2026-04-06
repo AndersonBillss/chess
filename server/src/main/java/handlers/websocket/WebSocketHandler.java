@@ -44,7 +44,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) throws Exception {
-
         var gson = new Gson();
         UserGameCommand command = gson.fromJson(ctx.message(), UserGameCommand.class);
         switch (command.getCommandType()) {
@@ -62,6 +61,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throws DataAccessException, IOException {
         sessions.addSession(command.getGameID(), ctx.session);
         var game = gameDao.getGame(command.getGameID());
+        if (game == null) {
+            throw new WebSocketException("Game does not exist");
+        }
         LoadGameMessage serverMessage = new LoadGameMessage(
                 game
         );
