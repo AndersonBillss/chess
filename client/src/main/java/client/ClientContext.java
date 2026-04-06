@@ -10,6 +10,7 @@ public class ClientContext {
     private WebSocketFacade webSocketFacade;
     private ChessBoard board;
     private ChessGame.TeamColor color;
+    private PromptManager promptManager;
 
     public void setServerFacade(ServerFacade serverFacade) {
         this.serverFacade = serverFacade;
@@ -41,5 +42,13 @@ public class ClientContext {
 
     public void setColor(ChessGame.TeamColor color) {
         this.color = color;
+    }
+
+    public PromptManager getPromptManager() {
+        return promptManager;
+    }
+
+    public void setPromptManager(PromptManager promptManager) {
+        this.promptManager = promptManager;
     }
 }

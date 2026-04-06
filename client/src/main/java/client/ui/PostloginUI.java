@@ -48,6 +48,7 @@ public class PostloginUI implements UI {
         System.out.println("  Observe a game: \"observe\" <ID> - a game");
         System.out.println("  Logout: \"logout\"");
         System.out.println("  Print this message: \"help\"\n");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -56,6 +57,7 @@ public class PostloginUI implements UI {
             ctx.getServerFacade().logout();
         } catch (ResponseException ignored) {
         }
+        ctx.getPromptManager().printPrompt();
         return new PreloginUI(ctx);
     }
 
@@ -70,8 +72,10 @@ public class PostloginUI implements UI {
             ctx.getServerFacade().createGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
+            ctx.getPromptManager().printPrompt();
             return this;
         }
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -90,6 +94,7 @@ public class PostloginUI implements UI {
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
         }
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -120,16 +125,19 @@ public class PostloginUI implements UI {
     private UI join(String[] input) {
         if (input.length != 3) {
             System.out.println("Join requires two arguments: <ID>, [WHITE|BLACK]");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
         String color = input[2].trim().toUpperCase();
         if (!Objects.equals(color, "WHITE") && !Objects.equals(color, "BLACK")) {
             System.out.println("Color must be black or white");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
@@ -138,6 +146,7 @@ public class PostloginUI implements UI {
             ctx.getServerFacade().joinGame(req);
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
@@ -155,11 +164,13 @@ public class PostloginUI implements UI {
     private UI observe(String[] input) {
         if (input.length != 2) {
             System.out.println("Observe requires one argument: <ID>");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
         GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
@@ -171,6 +182,7 @@ public class PostloginUI implements UI {
 
     private UI unknownCommand(String[] input) {
         System.out.printf("Unknown command: %s\n", input[0]);
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 }

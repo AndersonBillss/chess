@@ -88,11 +88,13 @@ public class GameplayUI implements UI {
         System.out.println("  Make a move: \"move\" <START> <END>");
         System.out.println("  Resign from a game: \"resign\"");
         System.out.println("  Highlight legal moves: \"highlight\"");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
     private UI leave() {
         System.out.println("Not implemented!");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -135,16 +137,19 @@ public class GameplayUI implements UI {
     private UI move(String[] input) {
         if (input.length < 3 || input.length > 4) {
             System.out.println("Move takes two or three arguments");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         ChessPosition pos1 = parseMove(input[1]);
         if (pos1 == null) {
             System.out.println(String.format("%s is not a valid move", input[1]));
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         ChessPosition pos2 = parseMove(input[2]);
         if (pos2 == null) {
             System.out.println(String.format("%s is not a valid move", input[2]));
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         ChessPiece.PieceType promotionPiece = null;
@@ -152,6 +157,7 @@ public class GameplayUI implements UI {
             promotionPiece = parsePromotionPiece(input[3]);
             if (promotionPiece == null) {
                 System.out.println(String.format("%s is not a valid promotion piece", input[3]));
+                ctx.getPromptManager().printPrompt();
                 return this;
             }
         }
@@ -167,16 +173,19 @@ public class GameplayUI implements UI {
 
     private UI resign() {
         System.out.println("Not implemented!");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
     private UI highlight() {
         System.out.println("Not implemented!");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
     private UI unknownCommand(String[] input) {
         System.out.printf("Unknown command: %s\n", input[0]);
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 }

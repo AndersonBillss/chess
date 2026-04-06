@@ -33,6 +33,7 @@ public class PreloginUI implements UI {
         System.out.println("  Login as existing user: \"login\" <USERNAME> <PASSWORD>");
         System.out.println("  Exit the program: \"quit\"");
         System.out.println("  Print this message: \"help\"\n");
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -45,6 +46,7 @@ public class PreloginUI implements UI {
         if (input.length != 3) {
             System.out.println("Login requires 2 arguments:" +
                     " <USERNAME>, <PASSWORD>");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         LoginRequest req = new LoginRequest(input[1], input[2]);
@@ -53,10 +55,12 @@ public class PreloginUI implements UI {
             username = ctx.getServerFacade().login(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
         System.out.println("Successfully logged in.");
+        ctx.getPromptManager().printPrompt();
         return new PostloginUI(ctx, username);
     }
 
@@ -64,6 +68,7 @@ public class PreloginUI implements UI {
         if (input.length != 4) {
             System.out.println("Register requires 3 arguments:" +
                     " <USERNAME>, <PASSWORD>, <EMAIL>");
+            ctx.getPromptManager().printPrompt();
             return this;
         }
         RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
@@ -72,15 +77,18 @@ public class PreloginUI implements UI {
             username = ctx.getServerFacade().register(req).username();
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
+            ctx.getPromptManager().printPrompt();
             return this;
         }
 
         System.out.println("Successfully registered.");
+        ctx.getPromptManager().printPrompt();
         return new PostloginUI(ctx, username);
     }
 
     private UI unknownCommand(String[] input) {
         System.out.printf("Unknown command: %s\n", input[0]);
+        ctx.getPromptManager().printPrompt();
         return this;
     }
 }

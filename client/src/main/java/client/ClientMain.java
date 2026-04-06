@@ -18,11 +18,11 @@ public class ClientMain {
         clientContext.setWebSocketFacade(new WebSocketFacade("http://localhost:8080",
                 (error) -> {
                     System.err.println(error.getErrorMessage());
+                    promptManager.printPrompt();
                 },
                 (game -> {
                     var board = game.getGame().game().getBoard();
                     clientContext.setBoard(board);
-                    System.out.println();
                     BoardDisplay.show(board, clientContext.getColor());
                     promptManager.printPrompt();
                 }),
@@ -30,9 +30,10 @@ public class ClientMain {
                     System.out.println(notification.getMessage());
                     promptManager.printPrompt();
                 }));
+        clientContext.setPromptManager(promptManager);
 
+        promptManager.printPrompt();
         while (!promptManager.done()) {
-            promptManager.printPrompt();
             promptManager.takeInput();
         }
     }
