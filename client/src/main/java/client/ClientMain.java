@@ -20,7 +20,7 @@ public class ClientMain {
                     System.err.println(error.getErrorMessage());
                 },
                 (game -> {
-                    var board = game.getGame().getBoard();
+                    var board = game.getGame().game().getBoard();
                     clientContext.setBoard(board);
                     System.out.println();
                     BoardDisplay.show(board, clientContext.getColor());

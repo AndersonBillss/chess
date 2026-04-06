@@ -1,13 +1,14 @@
 package client.ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ClientContext;
 import model.GameData;
-import ui.EscapeSequences;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class GameplayUI implements UI {
@@ -74,7 +75,7 @@ public class GameplayUI implements UI {
         return switch (input[0].toLowerCase()) {
             case "help" -> help();
             case "leave" -> leave();
-            case "move" -> move();
+            case "move" -> move(input);
             case "resign" -> resign();
             case "highlight" -> highlight();
             default -> unknownCommand(input);
@@ -95,8 +96,69 @@ public class GameplayUI implements UI {
         return this;
     }
 
-    private UI move() {
-        System.out.println("Not implemented!");
+    private ChessPosition parseMove(String input) {
+        Map<Character, Integer> movesToInt = Map.of(
+                'a', 1,
+                'b', 2,
+                'c', 3,
+                'd', 4,
+                'e', 5,
+                'f', 6,
+                'g', 7,
+                'h', 8
+        );
+        String trimmed = input.trim().toLowerCase();
+        Integer col = movesToInt.get(trimmed.charAt(0));
+        if (col == null) {
+            return null;
+        }
+        int row = trimmed.charAt(1) - '0';
+        if (row < 1 || row > 8) {
+            return null;
+        }
+
+        return new ChessPosition(row, col);
+    }
+
+    private ChessPiece.PieceType parsePromotionPiece(String input) {
+        Map<String, ChessPiece.PieceType> movesToInt = Map.of(
+                "queen", ChessPiece.PieceType.QUEEN,
+                "bishop", ChessPiece.PieceType.BISHOP,
+                "knight", ChessPiece.PieceType.KNIGHT,
+                "rook", ChessPiece.PieceType.ROOK
+        );
+
+        ChessPiece.PieceType parsed = movesToInt.get(input.trim().toLowerCase());
+        return parsed;
+    }
+
+    private UI move(String[] input) {
+        if (input.length < 3 || input.length > 4) {
+            System.out.println("Move takes two or three arguments");
+            return this;
+        }
+        ChessPosition pos1 = parseMove(input[1]);
+        if (pos1 == null) {
+            System.out.println(String.format("%s is not a valid move", input[1]));
+            return this;
+        }
+        ChessPosition pos2 = parseMove(input[2]);
+        if (pos2 == null) {
+            System.out.println(String.format("%s is not a valid move", input[2]));
+            return this;
+        }
+        ChessPiece.PieceType promotionPiece = null;
+        if (input.length == 4) {
+            promotionPiece = parsePromotionPiece(input[3]);
+            if (promotionPiece == null) {
+                System.out.println(String.format("%s is not a valid promotion piece", input[3]));
+                return this;
+            }
+        }
+
+        ChessMove move = new ChessMove(pos1, pos2, promotionPiece);
+
+        System.out.println("SUCCESS!");
         return this;
     }
 

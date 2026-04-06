@@ -50,7 +50,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sessions.addSession(command.getGameID(), ctx.session);
         var game = gameDao.getGame(command.getGameID());
         LoadGameMessage serverMessage = new LoadGameMessage(
-                game.game()
+                game
         );
         var message = new Gson().toJson(serverMessage);
         ctx.session.getRemote().sendString(message);
@@ -58,7 +58,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void makeMove(MakeMoveCommand command, Session session) {
-
     }
 
     private void leave(UserGameCommand command, Session session) {
