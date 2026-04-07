@@ -1,14 +1,14 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
+import model.GameData;
 import server.ServerFacade;
 import server.WebSocketFacade;
 
 public class ClientContext {
     private ServerFacade serverFacade;
     private WebSocketFacade webSocketFacade;
-    private ChessBoard board;
+    private GameData game;
     private ChessGame.TeamColor color;
     private PromptManager promptManager;
 
@@ -28,14 +28,6 @@ public class ClientContext {
         return webSocketFacade;
     }
 
-    public ChessBoard getBoard() {
-        return board;
-    }
-
-    public void setBoard(ChessBoard board) {
-        this.board = board;
-    }
-
     public ChessGame.TeamColor getColor() {
         return color;
     }
@@ -50,5 +42,13 @@ public class ClientContext {
 
     public void setPromptManager(PromptManager promptManager) {
         this.promptManager = promptManager;
+    }
+
+    public GameData getGame() {
+        return game;
+    }
+
+    public void setGame(GameData game) {
+        this.game = game;
     }
 }

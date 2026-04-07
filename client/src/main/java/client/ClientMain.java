@@ -21,11 +21,11 @@ public class ClientMain {
                     promptManager.printPrompt();
                 },
                 (game -> {
-                    var board = game.getGame().game().getBoard();
-                    clientContext.setBoard(board);
+                    var chessGame = game.getGame().game();
+                    clientContext.setGame(game.getGame());
                     promptManager.clearPrompt();
                     System.out.println();
-                    BoardDisplay.show(board, clientContext.getColor());
+                    BoardDisplay.show(chessGame, clientContext.getColor());
                     promptManager.printPrompt();
                 }),
                 (notification) -> {

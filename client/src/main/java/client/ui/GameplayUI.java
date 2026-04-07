@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import client.BoardDisplay;
 import client.ClientContext;
 import model.GameData;
 
@@ -18,15 +19,14 @@ public class GameplayUI implements UI {
 
     private ClientContext ctx;
     private Mode mode;
-    private GameData game;
     private String username;
 
     public GameplayUI(
             ClientContext ctx, Mode mode, GameData game, String username
     ) {
         this.ctx = ctx;
+        this.ctx.setGame(game);
         this.mode = mode;
-        this.game = game;
         this.username = username;
         ctx.setColor(getColor());
 
@@ -49,10 +49,10 @@ public class GameplayUI implements UI {
         if (mode == Mode.OBSERVER) {
             return ChessGame.TeamColor.WHITE;
         }
-        if (Objects.equals(username, game.whiteUsername())) {
+        if (Objects.equals(username, ctx.getGame().whiteUsername())) {
             return ChessGame.TeamColor.WHITE;
         }
-        if (Objects.equals(username, game.blackUsername())) {
+        if (Objects.equals(username, ctx.getGame().blackUsername())) {
             return ChessGame.TeamColor.BLACK;
         }
         return ChessGame.TeamColor.WHITE;
@@ -65,7 +65,7 @@ public class GameplayUI implements UI {
             case PLAYER -> "Playing";
         };
 
-        return String.format("%s: %s", modeString, game.gameName());
+        return String.format("%s: %s", modeString, ctx.getGame().gameName());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class GameplayUI implements UI {
             case "leave" -> leave();
             case "move" -> move(input);
             case "resign" -> resign();
-            case "highlight" -> highlight();
+            case "highlight" -> highlight(input);
             default -> unknownCommand(input);
         };
     }
@@ -157,7 +157,7 @@ public class GameplayUI implements UI {
         ChessMove move = new ChessMove(pos1, pos2, promotionPiece);
         ctx.getWebSocketFacade().makeMove(
                 ctx.getServerFacade().getAuthToken(),
-                game.gameID(),
+                ctx.getGame().gameID(),
                 move);
 
         return this;
@@ -168,8 +168,22 @@ public class GameplayUI implements UI {
         return this;
     }
 
-    private UI highlight() {
-        ctx.getPromptManager().println("Not implemented!");
+    private UI highlight(String[] input) {
+        if (input.length != 2) {
+            ctx.getPromptManager().println("Input takes one argument");
+        }
+        ChessPosition pos = parseMove(input[1]);
+        if (pos == null) {
+            ctx.getPromptManager().println(String.format("%s is not a valid move", input[1]));
+            return this;
+        }
+        if (ctx.getGame().game().getBoard().getPiece(pos) == null) {
+            ctx.getPromptManager().println(String.format("%s does not have a piece",
+                    input[1].toLowerCase().trim()));
+            return this;
+        }
+        BoardDisplay.show(ctx.getGame().game(), ctx.getColor(), pos);
+
         return this;
     }
 

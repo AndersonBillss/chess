@@ -1,19 +1,37 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import ui.EscapeSequences;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+
 public class BoardDisplay {
-    public static void show(ChessBoard board, ChessGame.TeamColor color) {
+    public static void show(ChessGame game, ChessGame.TeamColor color) {
+        show(game, color, null);
+    }
+
+    public static void show(
+            ChessGame game,
+            ChessGame.TeamColor color,
+            ChessPosition revealPosition) {
         String borderEsc = String.format("%s%s%s",
-                EscapeSequences.SET_BG_COLOR_GREEN,
+                EscapeSequences.SET_BG_COLOR_WHITE,
                 EscapeSequences.SET_TEXT_COLOR_BLACK,
                 EscapeSequences.SET_TEXT_BOLD);
         String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+        String highlightEsc = EscapeSequences.SET_BG_COLOR_YELLOW;
+        String moveLightEsc = EscapeSequences.SET_BG_COLOR_GREEN;
+        String moveDarkEsc = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+        Collection<ChessPosition> possiblePositions = new ArrayList<>();
+        if (revealPosition != null) {
+            var possibleMoves = game.validMoves(revealPosition);
+            for (var move : possibleMoves) {
+                possiblePositions.add(move.getEndPosition());
+            }
+        }
         String resetEsc = String.format("%s%s%s",
                 EscapeSequences.RESET_TEXT_COLOR,
                 EscapeSequences.RESET_BG_COLOR,
@@ -77,13 +95,21 @@ public class BoardDisplay {
                 int rowPattern = row % 2 == 0 ? 1 : -1;
                 int colPattern = col % 2 == 0 ? 1 : -1;
                 boolean isWhiteCell = rowPattern * colPattern == -1;
+                ChessPosition currPosition = new ChessPosition(row + 1, col + 1);
                 String cellEsc = isWhiteCell ? cellWhiteEsc : cellBlackEsc;
+                boolean isHighlighted = Objects.equals(currPosition, revealPosition);
+                boolean isRevealed = possiblePositions.contains(currPosition);
+                if (isHighlighted) {
+                    cellEsc = highlightEsc;
+                } else if (isRevealed) {
+                    cellEsc = isWhiteCell ? moveLightEsc : moveDarkEsc;
+                }
                 System.out.printf("%s ", cellEsc);
-                ChessPiece piece = board.getPiece(new ChessPosition(row + 1, col + 1));
+                ChessPiece piece = game.getBoard().getPiece(currPosition);
                 if (onRowTop) {
                     System.out.print(EscapeSequences.EMPTY);
                 } else {
-                    printCell(piece);
+                    printCell(piece, isHighlighted, isRevealed, isWhiteCell);
                 }
                 System.out.print(" ");
             }
@@ -99,7 +125,10 @@ public class BoardDisplay {
         System.out.print(EscapeSequences.RESET_BG_COLOR);
     }
 
-    private static void printCell(ChessPiece piece) {
+    private static void printCell(ChessPiece piece,
+                                  boolean isHighlighted,
+                                  boolean isRevealed,
+                                  boolean isWhiteCell) {
         if (piece == null) {
             System.out.print(EscapeSequences.EMPTY);
         } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
@@ -121,7 +150,11 @@ public class BoardDisplay {
                 case ChessPiece.PieceType.KING -> EscapeSequences.WHITE_KING;
                 case ChessPiece.PieceType.QUEEN -> EscapeSequences.WHITE_QUEEN;
             };
-            System.out.printf("%s%s", EscapeSequences.SET_TEXT_COLOR_WHITE, esc);
+            if (isHighlighted) {
+                System.out.printf("%s%s", EscapeSequences.SET_TEXT_COLOR_DARK_GREY, esc);
+            } else {
+                System.out.printf("%s%s", EscapeSequences.SET_TEXT_COLOR_WHITE, esc);
+            }
         }
     }
 }
