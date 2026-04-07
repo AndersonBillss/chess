@@ -53,8 +53,18 @@ public class ChessGame {
      * Enum identifying the 2 possible teams in a chess game
      */
     public enum TeamColor {
-        WHITE,
-        BLACK
+        WHITE {
+            @Override
+            public String toString() {
+                return "White";
+            }
+        },
+        BLACK {
+            @Override
+            public String toString() {
+                return "Black";
+            }
+        },
     }
 
     /**

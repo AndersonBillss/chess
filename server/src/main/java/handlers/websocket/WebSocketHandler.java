@@ -82,9 +82,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         AuthData authData = authDao.getAuth(command.getAuthToken());
         UserData user = userDao.getUser(authData.username());
-        ChessGame.TeamColor userColor = Objects.equals(game.whiteUsername(), user.username())
-                ? ChessGame.TeamColor.WHITE : Objects.equals(game.blackUsername(), user.username())
-                ? ChessGame.TeamColor.BLACK : null;
+        ChessGame.TeamColor userColor;
+        ChessGame.TeamColor opposingColor;
+        if (Objects.equals(game.whiteUsername(), user.username())) {
+            userColor = ChessGame.TeamColor.WHITE;
+            opposingColor = ChessGame.TeamColor.BLACK;
+        } else if (Objects.equals(game.blackUsername(), user.username())) {
+            userColor = ChessGame.TeamColor.BLACK;
+            opposingColor = ChessGame.TeamColor.WHITE;
+        } else {
+            userColor = null;
+            opposingColor = null;
+        }
         if (userColor == null) {
             throw new WebSocketException("Not a player in the game");
         }
@@ -94,7 +103,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         game.game().makeMove(command.getMove());
         gameDao.editGame(game);
-
         sessions.broadcast(game);
         sessions.broadcast(
                 game.gameID(),
@@ -104,6 +112,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         command.getMove().toString()
                 )
         );
+        if (game.game().isInCheck(opposingColor, game.game().getBoard())) {
+            sessions.broadcast(game.gameID(), null,
+                    String.format("%s player is in check!", opposingColor));
+        } else if (game.game().isInCheckmate(opposingColor)) {
+            sessions.broadcast(game.gameID(), null,
+                    String.format("%s player is in checkmate!", opposingColor));
+        } else if (game.game().isInStalemate(opposingColor)) {
+            sessions.broadcast(game.gameID(), null,
+                    "%s player cannot move. Game ends in stalemate!"
+            );
+        }
     }
 
     private void leave(UserGameCommand command, Session session) {
