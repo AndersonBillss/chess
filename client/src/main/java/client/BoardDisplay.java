@@ -109,7 +109,7 @@ public class BoardDisplay {
                 if (onRowTop) {
                     System.out.print(EscapeSequences.EMPTY);
                 } else {
-                    printCell(piece, isHighlighted, isRevealed, isWhiteCell);
+                    printCell(piece, isHighlighted);
                 }
                 System.out.print(" ");
             }
@@ -126,9 +126,7 @@ public class BoardDisplay {
     }
 
     private static void printCell(ChessPiece piece,
-                                  boolean isHighlighted,
-                                  boolean isRevealed,
-                                  boolean isWhiteCell) {
+                                  boolean isHighlighted) {
         if (piece == null) {
             System.out.print(EscapeSequences.EMPTY);
         } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
