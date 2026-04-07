@@ -70,7 +70,7 @@ public class GameplayUI implements UI {
 
     @Override
     public UI handleInput(String[] input) {
-        if(mode == Mode.OBSERVER) {
+        if (mode == Mode.OBSERVER) {
             return switch (input[0].toLowerCase()) {
                 case "help" -> help();
                 case "redraw" -> redraw();
@@ -97,7 +97,7 @@ public class GameplayUI implements UI {
     }
 
     private UI help() {
-        if(mode == Mode.OBSERVER) {
+        if (mode == Mode.OBSERVER) {
             ctx.getPromptManager().println("  Redraw the board: \"redraw\"");
             ctx.getPromptManager().println("  Leave the game: \"leave\"");
             ctx.getPromptManager().println("  Highlight legal moves: \"highlight\"");
@@ -112,8 +112,11 @@ public class GameplayUI implements UI {
     }
 
     private UI leave() {
-        ctx.getPromptManager().println("Not implemented!");
-        return this;
+        ctx.getPromptManager().println("Leaving game...");
+        ctx.getWebSocketFacade().leaveGame(
+                this.ctx.getServerFacade().getAuthToken(),
+                this.ctx.getGame().gameID());
+        return new PostloginUI(this.ctx, this.username);
     }
 
     private ChessPosition parseMove(String input) {
@@ -193,6 +196,7 @@ public class GameplayUI implements UI {
     private UI highlight(String[] input) {
         if (input.length != 2) {
             ctx.getPromptManager().println("Input takes one argument");
+            return this;
         }
         ChessPosition pos = parseMove(input[1]);
         if (pos == null) {
