@@ -73,9 +73,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         );
         var message = new Gson().toJson(serverMessage);
         ctx.session.getRemote().sendString(message);
-        ChessGame.TeamColor color = getInitialColor(user, game, ctx.session);
+        ChessGame.TeamColor color = getInitialColor(user, game);
         sessions.addSession(command.getGameID(), ctx.session, color);
-        String roleString = color == null ? "Observer" : color.toString().toLowerCase();
+        String roleString = color == null ? "an observer" : color.toString().toLowerCase();
 
         sessions.broadcast(
                 command.getGameID(),
@@ -186,21 +186,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private ChessGame.TeamColor getInitialColor(
-            UserData user, GameData game, Session session) {
-        SessionData sessionData = sessions.findSession(game.gameID(), session);
-        boolean hasWhitePlayer = Objects.equals(game.whiteUsername(), user.username());
-        boolean hasBlackPlayer = Objects.equals(game.blackUsername(), user.username());
-        if (sessionData == null) {
-            if (hasWhitePlayer) {
-                return ChessGame.TeamColor.WHITE;
-            } else if (hasBlackPlayer) {
-                return ChessGame.TeamColor.BLACK;
-            }
-        } else if (hasWhitePlayer) {
+            UserData user, GameData game) {
+        boolean isWhitePlayer = Objects.equals(game.whiteUsername(), user.username());
+        boolean hasWhitePlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.WHITE);
+        boolean isBlackPlayer = Objects.equals(game.blackUsername(), user.username());
+        boolean hasBlackPlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.WHITE);
+        if (isWhitePlayer && hasWhitePlayer) {
             return ChessGame.TeamColor.BLACK;
-        } else if (hasBlackPlayer) {
+        }
+        if (isBlackPlayer && hasBlackPlayer) {
             return ChessGame.TeamColor.WHITE;
         }
+        if (isBlackPlayer) {
+            return ChessGame.TeamColor.BLACK;
+        }
+        if (isWhitePlayer) {
+            return ChessGame.TeamColor.WHITE;
+        }
+
         return null;
     }
 

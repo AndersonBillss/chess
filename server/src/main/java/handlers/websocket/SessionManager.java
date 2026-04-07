@@ -42,6 +42,19 @@ public class SessionManager {
         return null;
     }
 
+    public boolean hasPlayer(int gameId, ChessGame.TeamColor color) {
+        var sessions = gameSessions.get(gameId);
+        if (sessions == null) {
+            return false;
+        }
+        for (var s : sessions) {
+            if (s.color() == color) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void removeSession(int gameId, Session session) {
         var sessions = gameSessions.get(gameId);
         if (sessions == null) {
