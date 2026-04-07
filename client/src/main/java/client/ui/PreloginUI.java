@@ -29,24 +29,22 @@ public class PreloginUI implements UI {
     }
 
     private UI help() {
-        System.out.println("  Register new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>");
-        System.out.println("  Login as existing user: \"login\" <USERNAME> <PASSWORD>");
-        System.out.println("  Exit the program: \"quit\"");
-        System.out.println("  Print this message: \"help\"\n");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("  Register new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>");
+        ctx.getPromptManager().println("  Login as existing user: \"login\" <USERNAME> <PASSWORD>");
+        ctx.getPromptManager().println("  Exit the program: \"quit\"");
+        ctx.getPromptManager().println("  Print this message: \"help\"\n");
         return this;
     }
 
     private UI quit() {
-        System.out.println("Goodbye!");
+        ctx.getPromptManager().println("Goodbye!");
         return null;
     }
 
     private UI login(String[] input) {
         if (input.length != 3) {
-            System.out.println("Login requires 2 arguments:" +
+            ctx.getPromptManager().println("Login requires 2 arguments:" +
                     " <USERNAME>, <PASSWORD>");
-            ctx.getPromptManager().printPrompt();
             return this;
         }
         LoginRequest req = new LoginRequest(input[1], input[2]);
@@ -54,21 +52,18 @@ public class PreloginUI implements UI {
         try {
             username = ctx.getServerFacade().login(req).username();
         } catch (ResponseException e) {
-            System.out.println(e.getMessage());
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(e.getMessage());
             return this;
         }
 
-        System.out.println("Successfully logged in.");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Successfully logged in.");
         return new PostloginUI(ctx, username);
     }
 
     private UI register(String[] input) {
         if (input.length != 4) {
-            System.out.println("Register requires 3 arguments:" +
+            ctx.getPromptManager().println("Register requires 3 arguments:" +
                     " <USERNAME>, <PASSWORD>, <EMAIL>");
-            ctx.getPromptManager().printPrompt();
             return this;
         }
         RegisterRequest req = new RegisterRequest(input[1], input[2], input[3]);
@@ -76,19 +71,16 @@ public class PreloginUI implements UI {
         try {
             username = ctx.getServerFacade().register(req).username();
         } catch (ResponseException e) {
-            System.out.println(e.getMessage());
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(e.getMessage());
             return this;
         }
 
-        System.out.println("Successfully registered.");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Successfully registered.");
         return new PostloginUI(ctx, username);
     }
 
     private UI unknownCommand(String[] input) {
-        System.out.printf("Unknown command: %s\n", input[0]);
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Unknown command: " + input[0]);
         return this;
     }
 }

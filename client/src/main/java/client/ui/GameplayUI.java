@@ -82,18 +82,16 @@ public class GameplayUI implements UI {
     }
 
     private UI help() {
-        System.out.println("  Redraw the board: \"redraw\"");
-        System.out.println("  Leave the game: \"leave\"");
-        System.out.println("  Make a move: \"move\" <START> <END>");
-        System.out.println("  Resign from a game: \"resign\"");
-        System.out.println("  Highlight legal moves: \"highlight\"");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("  Redraw the board: \"redraw\"");
+        ctx.getPromptManager().println("  Leave the game: \"leave\"");
+        ctx.getPromptManager().println("  Make a move: \"move\" <START> <END>");
+        ctx.getPromptManager().println("  Resign from a game: \"resign\"");
+        ctx.getPromptManager().println("  Highlight legal moves: \"highlight\"");
         return this;
     }
 
     private UI leave() {
-        System.out.println("Not implemented!");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Not implemented!");
         return this;
     }
 
@@ -135,28 +133,24 @@ public class GameplayUI implements UI {
 
     private UI move(String[] input) {
         if (input.length < 3 || input.length > 4) {
-            System.out.println("Move takes two or three arguments");
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println("Move takes two or three arguments");
             return this;
         }
         ChessPosition pos1 = parseMove(input[1]);
         if (pos1 == null) {
-            System.out.println(String.format("%s is not a valid move", input[1]));
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(String.format("%s is not a valid move", input[1]));
             return this;
         }
         ChessPosition pos2 = parseMove(input[2]);
         if (pos2 == null) {
-            System.out.println(String.format("%s is not a valid move", input[2]));
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(String.format("%s is not a valid move", input[2]));
             return this;
         }
         ChessPiece.PieceType promotionPiece = null;
         if (input.length == 4) {
             promotionPiece = parsePromotionPiece(input[3]);
             if (promotionPiece == null) {
-                System.out.println(String.format("%s is not a valid promotion piece", input[3]));
-                ctx.getPromptManager().printPrompt();
+                ctx.getPromptManager().println(String.format("%s is not a valid promotion piece", input[3]));
                 return this;
             }
         }
@@ -171,20 +165,17 @@ public class GameplayUI implements UI {
     }
 
     private UI resign() {
-        System.out.println("Not implemented!");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Not implemented!");
         return this;
     }
 
     private UI highlight() {
-        System.out.println("Not implemented!");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Not implemented!");
         return this;
     }
 
     private UI unknownCommand(String[] input) {
-        System.out.printf("Unknown command: %s\n", input[0]);
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Unknown command: " + input[0]);
         return this;
     }
 }

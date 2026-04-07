@@ -17,25 +17,25 @@ public class ClientMain {
         clientContext.setServerFacade(new ServerFacade("http://localhost:8080"));
         clientContext.setWebSocketFacade(new WebSocketFacade("http://localhost:8080",
                 (error) -> {
-                    System.out.print(error.getErrorMessage());
+                    promptManager.print(error.getErrorMessage(), true);
                     promptManager.printPrompt();
                 },
                 (game -> {
                     var board = game.getGame().game().getBoard();
-                    System.out.println();
                     clientContext.setBoard(board);
+                    promptManager.clearPrompt();
+                    System.out.println();
                     BoardDisplay.show(board, clientContext.getColor());
                     promptManager.printPrompt();
                 }),
                 (notification) -> {
-                    System.out.println();
-                    System.out.println(notification.getMessage());
+                    promptManager.println(notification.getMessage(), true);
                     promptManager.printPrompt();
                 }));
         clientContext.setPromptManager(promptManager);
 
-        promptManager.printPrompt();
         while (!promptManager.done()) {
+            promptManager.printPrompt();
             promptManager.takeInput();
         }
     }

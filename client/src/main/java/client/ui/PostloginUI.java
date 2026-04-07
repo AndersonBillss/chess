@@ -42,13 +42,12 @@ public class PostloginUI implements UI {
     }
 
     private UI help() {
-        System.out.println("  List current games: \"list\"");
-        System.out.println("  Create a new game: \"create\" <NAME>");
-        System.out.println("  Join a game: \"join\" <ID> [WHITE|BLACK]");
-        System.out.println("  Observe a game: \"observe\" <ID> - a game");
-        System.out.println("  Logout: \"logout\"");
-        System.out.println("  Print this message: \"help\"\n");
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("  List current games: \"list\"");
+        ctx.getPromptManager().println("  Create a new game: \"create\" <NAME>");
+        ctx.getPromptManager().println("  Join a game: \"join\" <ID> [WHITE|BLACK]");
+        ctx.getPromptManager().println("  Observe a game: \"observe\" <ID> - a game");
+        ctx.getPromptManager().println("  Logout: \"logout\"");
+        ctx.getPromptManager().println("  Print this message: \"help\"\n");
         return this;
     }
 
@@ -57,13 +56,12 @@ public class PostloginUI implements UI {
             ctx.getServerFacade().logout();
         } catch (ResponseException ignored) {
         }
-        ctx.getPromptManager().printPrompt();
         return new PreloginUI(ctx);
     }
 
     private UI create(String[] input) {
         if (input.length != 2) {
-            System.out.println("Create requires 1 argument:" +
+            ctx.getPromptManager().println("Create requires 1 argument:" +
                     " <NAME>");
             return this;
         }
@@ -71,30 +69,28 @@ public class PostloginUI implements UI {
         try {
             ctx.getServerFacade().createGame(req);
         } catch (ResponseException e) {
-            System.out.println(e.getMessage());
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(e.getMessage());
             return this;
         }
-        ctx.getPromptManager().printPrompt();
         return this;
     }
 
     private UI list() {
         try {
             var games = new ArrayList<>(ctx.getServerFacade().listGames().games());
-            System.out.println("Games:");
+            ctx.getPromptManager().println("Games:");
             for (int i = 0; i < games.size(); i++) {
                 var game = games.get(i);
-                System.out.printf("  %d. game name: %s    White: %s    Black: %s%n",
+                ctx.getPromptManager().println(String.format(
+                        "  %d. game name: %s    White: %s    Black: %s",
                         i + 1,
                         game.gameName(),
                         game.whiteUsername() == null ? "None" : game.whiteUsername(),
-                        game.blackUsername() == null ? "None" : game.blackUsername());
+                        game.blackUsername() == null ? "None" : game.blackUsername()));
             }
         } catch (ResponseException e) {
-            System.out.println(e.getMessage());
+            ctx.getPromptManager().println(e.getMessage());
         }
-        ctx.getPromptManager().printPrompt();
         return this;
     }
 
@@ -103,19 +99,19 @@ public class PostloginUI implements UI {
         try {
             games = new ArrayList<>(ctx.getServerFacade().listGames().games());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            ctx.getPromptManager().println(e.getMessage());
             return null;
         }
         int gameIndex;
         try {
             gameIndex = parseInt(gameIndexStr.trim()) - 1;
         } catch (NumberFormatException e) {
-            System.out.println("Invalid number");
+            ctx.getPromptManager().println("Invalid number");
             return null;
         }
 
         if (gameIndex > games.size() || gameIndex < 0) {
-            System.out.printf("Game does not exist: %d\n", gameIndex + 1);
+            ctx.getPromptManager().println("Game does not exist: " + (gameIndex + 1));
             return null;
         }
 
@@ -124,20 +120,17 @@ public class PostloginUI implements UI {
 
     private UI join(String[] input) {
         if (input.length != 3) {
-            System.out.println("Join requires two arguments: <ID>, [WHITE|BLACK]");
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println("Join requires two arguments: <ID>, [WHITE|BLACK]");
             return this;
         }
         GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
-            ctx.getPromptManager().printPrompt();
             return this;
         }
 
         String color = input[2].trim().toUpperCase();
         if (!Objects.equals(color, "WHITE") && !Objects.equals(color, "BLACK")) {
-            System.out.println("Color must be black or white");
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println("Color must be black or white");
             return this;
         }
 
@@ -145,14 +138,13 @@ public class PostloginUI implements UI {
             JoinGameRequest req = new JoinGameRequest(color, gameData.gameID());
             ctx.getServerFacade().joinGame(req);
         } catch (ResponseException e) {
-            System.out.println(e.getMessage());
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println(e.getMessage());
             return this;
         }
 
         ChessGame.TeamColor teamColor = Objects.equals(color, "BLACK") ? ChessGame.TeamColor.BLACK
                 : ChessGame.TeamColor.WHITE;
-        System.out.println("Successfully joined game.");
+        ctx.getPromptManager().println("Successfully joined game.");
         return new GameplayUI(
                 ctx,
                 GameplayUI.Mode.PLAYER,
@@ -163,14 +155,12 @@ public class PostloginUI implements UI {
 
     private UI observe(String[] input) {
         if (input.length != 2) {
-            System.out.println("Observe requires one argument: <ID>");
-            ctx.getPromptManager().printPrompt();
+            ctx.getPromptManager().println("Observe requires one argument: <ID>");
             return this;
         }
 
         GameData gameData = getGameFromInput(input[1]);
         if (gameData == null) {
-            ctx.getPromptManager().printPrompt();
             return this;
         }
 
@@ -181,8 +171,7 @@ public class PostloginUI implements UI {
     }
 
     private UI unknownCommand(String[] input) {
-        System.out.printf("Unknown command: %s\n", input[0]);
-        ctx.getPromptManager().printPrompt();
+        ctx.getPromptManager().println("Unknown command: " + input[0]);
         return this;
     }
 }
