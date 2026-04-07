@@ -3,7 +3,7 @@ package client;
 import chess.ChessGame;
 import model.GameData;
 import server.ServerFacade;
-import server.WebSocketFacade;
+import client.websocket.WebSocketFacade;
 
 public class ClientContext {
     private ServerFacade serverFacade;

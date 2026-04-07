@@ -1,4 +1,4 @@
-package server;
+package client.websocket;
 
 import chess.ChessMove;
 import com.google.gson.Gson;

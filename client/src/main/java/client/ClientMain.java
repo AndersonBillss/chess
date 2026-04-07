@@ -4,7 +4,7 @@ import chess.*;
 import client.ui.*;
 import exception.ResponseException;
 import server.ServerFacade;
-import server.WebSocketFacade;
+import client.websocket.WebSocketFacade;
 
 public class ClientMain {
     public static void main(String[] args) throws ResponseException {
