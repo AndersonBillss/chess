@@ -76,7 +76,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         sessions.broadcast(command.getGameID(), ctx.session, "New user joined");
     }
 
-    private void makeMove(MakeMoveCommand command, Session session) throws DataAccessException, InvalidMoveException, IOException {
+    private void makeMove(MakeMoveCommand command, Session session)
+            throws DataAccessException, InvalidMoveException, IOException {
         UserData user = getUser(command.getAuthToken());
         var game = getGame(command.getGameID());
         if (game.game().isGameOver()) {
@@ -119,15 +120,39 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void leave(UserGameCommand command, Session session) {
-
+    private void leave(UserGameCommand command, Session session)
+            throws DataAccessException, IOException {
+        UserData user = getUser(command.getAuthToken());
+        GameData game = getGame(command.getGameID());
+        ChessGame.TeamColor userColor = getPlayerColor(user, game);
+        if (userColor == ChessGame.TeamColor.WHITE) {
+            game = new GameData(game.gameID(),
+                    null,
+                    game.blackUsername(),
+                    game.gameName(),
+                    game.game());
+        } else {
+            game = new GameData(game.gameID(),
+                    game.whiteUsername(),
+                    null,
+                    game.gameName(),
+                    game.game());
+        }
+        gameDao.editGame(game);
+        sessions.removeSession(game.gameID(), session);
+        sessions.broadcast(
+                game.gameID(),
+                session,
+                String.format("%s left the game", user.username())
+        );
     }
 
-    private void resign(UserGameCommand command, Session session) throws DataAccessException, IOException {
+    private void resign(UserGameCommand command, Session session)
+            throws DataAccessException, IOException {
         UserData user = getUser(command.getAuthToken());
         GameData game = getGame(command.getGameID());
         ChessGame.TeamColor playerColor = getPlayerColor(user, game);
-        if(playerColor == null) {
+        if (playerColor == null) {
             throw new WebSocketException("You are not playing in this game");
         }
         if (game.game().isGameOver()) {
