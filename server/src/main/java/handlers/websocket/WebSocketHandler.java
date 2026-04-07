@@ -190,7 +190,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         boolean isWhitePlayer = Objects.equals(game.whiteUsername(), user.username());
         boolean hasWhitePlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.WHITE);
         boolean isBlackPlayer = Objects.equals(game.blackUsername(), user.username());
-        boolean hasBlackPlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.WHITE);
+        boolean hasBlackPlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.BLACK);
+        if(hasWhitePlayer && hasBlackPlayer) {
+            return null;
+        }
         if (isWhitePlayer && hasWhitePlayer) {
             return ChessGame.TeamColor.BLACK;
         }

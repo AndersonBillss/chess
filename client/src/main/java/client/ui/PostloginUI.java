@@ -145,6 +145,7 @@ public class PostloginUI implements UI {
         ChessGame.TeamColor teamColor = Objects.equals(color, "BLACK") ? ChessGame.TeamColor.BLACK
                 : ChessGame.TeamColor.WHITE;
         ctx.getPromptManager().println("Successfully joined game.");
+        ctx.setColor(ChessGame.TeamColor.WHITE);
         return new GameplayUI(
                 ctx,
                 GameplayUI.Mode.PLAYER,

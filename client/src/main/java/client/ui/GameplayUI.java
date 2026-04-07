@@ -20,7 +20,6 @@ public class GameplayUI implements UI {
     private Mode mode;
     private GameData game;
     private String username;
-    private ChessGame.TeamColor color;
 
     public GameplayUI(
             ClientContext ctx, Mode mode, GameData game, String username
@@ -40,12 +39,12 @@ public class GameplayUI implements UI {
             ClientContext ctx, Mode mode, GameData game, String username, ChessGame.TeamColor color
     ) {
         this(ctx, mode, game, username);
-        this.color = color;
+        this.ctx.setColor(color);
     }
 
     public ChessGame.TeamColor getColor() {
-        if (color != null) {
-            return color;
+        if (ctx.getColor() != null) {
+            return ctx.getColor();
         }
         if (mode == Mode.OBSERVER) {
             return ChessGame.TeamColor.WHITE;
