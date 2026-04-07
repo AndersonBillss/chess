@@ -1,7 +1,7 @@
 package handlers.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.GameDAO;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.LoadGameMessage;
@@ -14,19 +14,32 @@ import java.util.Map;
 import java.util.Objects;
 
 public class SessionManager {
-    public final Map<Integer, ArrayList<Session>> gameSessions;
+    public final Map<Integer, ArrayList<SessionData>> gameSessions;
 
     public SessionManager() {
         this.gameSessions = new HashMap<>();
     }
 
-    public void addSession(int gameId, Session session) {
+    public void addSession(int gameId, Session session, ChessGame.TeamColor color) {
         var sessions = gameSessions.get(gameId);
         if (sessions == null) {
             sessions = new ArrayList<>();
             gameSessions.put(gameId, sessions);
         }
-        sessions.add(session);
+        sessions.add(new SessionData(session, color));
+    }
+
+    public SessionData findSession(int gameId, Session session) {
+        var sessions = gameSessions.get(gameId);
+        if (sessions == null) {
+            return null;
+        }
+        for (var s : sessions) {
+            if (Objects.equals(s.session(), session)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     public void removeSession(int gameId, Session session) {
@@ -34,7 +47,17 @@ public class SessionManager {
         if (sessions == null) {
             return;
         }
-        sessions.remove(session);
+        Integer sessionIndex = null;
+        for (int i = 0; i < sessions.size(); i++) {
+            if (Objects.equals(sessions.get(i).session(), session)) {
+                sessionIndex = i;
+                break;
+            }
+        }
+        if (sessionIndex == null) {
+            return;
+        }
+        sessions.remove(sessionIndex.intValue());
     }
 
     public void broadcast(int gameId, Session excludedSession, String message) throws IOException {
@@ -43,9 +66,9 @@ public class SessionManager {
             return;
         }
         for (var session : sessions) {
-            if (!Objects.equals(session, excludedSession)) {
+            if (!Objects.equals(session.session(), excludedSession)) {
                 String response = new Gson().toJson(new NotificationMessage(message));
-                session.getRemote().sendString(response);
+                session.session().getRemote().sendString(response);
             }
         }
     }
@@ -60,9 +83,9 @@ public class SessionManager {
             return;
         }
         for (var session : sessions) {
-            if (!Objects.equals(session, excludedSession)) {
+            if (!Objects.equals(session.session(), excludedSession)) {
                 String response = new Gson().toJson(new LoadGameMessage(game));
-                session.getRemote().sendString(response);
+                session.session().getRemote().sendString(response);
             }
         }
     }

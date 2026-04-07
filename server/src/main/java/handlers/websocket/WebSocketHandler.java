@@ -60,7 +60,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void connect(UserGameCommand command, WsMessageContext ctx)
             throws DataAccessException, IOException {
-        sessions.addSession(command.getGameID(), ctx.session);
+        var user = getUser(command.getAuthToken());
         var game = gameDao.getGame(command.getGameID());
         if (authDao.getAuth(command.getAuthToken()) == null) {
             throw new WebSocketException("Unauthorized");
@@ -73,7 +73,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         );
         var message = new Gson().toJson(serverMessage);
         ctx.session.getRemote().sendString(message);
-        sessions.broadcast(command.getGameID(), ctx.session, "New user joined");
+        ChessGame.TeamColor color = getInitialColor(user, game, ctx.session);
+        sessions.addSession(command.getGameID(), ctx.session, color);
+        String roleString = color == null ? "Observer" : color.toString().toLowerCase();
+
+        sessions.broadcast(
+                command.getGameID(),
+                ctx.session,
+                String.format("%s has joined as %s",
+                        user.username(),
+                        roleString));
     }
 
     private void makeMove(MakeMoveCommand command, Session session)
@@ -83,7 +92,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         if (game.game().isGameOver()) {
             throw new WebSocketException("Game is finished");
         }
-        ChessGame.TeamColor userColor = getPlayerColor(user, game);
+        ChessGame.TeamColor userColor = getPlayerColor(game, session);
         if (userColor == null) {
             throw new WebSocketException("Not a player in the game");
         }
@@ -124,7 +133,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throws DataAccessException, IOException {
         UserData user = getUser(command.getAuthToken());
         GameData game = getGame(command.getGameID());
-        ChessGame.TeamColor userColor = getPlayerColor(user, game);
+        ChessGame.TeamColor userColor = getPlayerColor(game, session);
         if (userColor == ChessGame.TeamColor.WHITE) {
             game = new GameData(game.gameID(),
                     null,
@@ -151,7 +160,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throws DataAccessException, IOException {
         UserData user = getUser(command.getAuthToken());
         GameData game = getGame(command.getGameID());
-        ChessGame.TeamColor playerColor = getPlayerColor(user, game);
+        ChessGame.TeamColor playerColor = getPlayerColor(game, session);
         if (playerColor == null) {
             throw new WebSocketException("You are not playing in this game");
         }
@@ -165,14 +174,34 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         );
     }
 
-    private ChessGame.TeamColor getPlayerColor(UserData user, GameData game) {
-        if (Objects.equals(game.whiteUsername(), user.username())) {
+    private ChessGame.TeamColor getPlayerColor(
+            GameData game, Session session) {
+        SessionData sessionData = sessions.findSession(game.gameID(), session);
+        if (sessionData.color() == ChessGame.TeamColor.WHITE) {
             return ChessGame.TeamColor.WHITE;
-        } else if (Objects.equals(game.blackUsername(), user.username())) {
+        } else if (sessionData.color() == ChessGame.TeamColor.BLACK) {
             return ChessGame.TeamColor.BLACK;
-        } else {
-            return null;
         }
+        return null;
+    }
+
+    private ChessGame.TeamColor getInitialColor(
+            UserData user, GameData game, Session session) {
+        SessionData sessionData = sessions.findSession(game.gameID(), session);
+        boolean hasWhitePlayer = Objects.equals(game.whiteUsername(), user.username());
+        boolean hasBlackPlayer = Objects.equals(game.blackUsername(), user.username());
+        if (sessionData == null) {
+            if (hasWhitePlayer) {
+                return ChessGame.TeamColor.WHITE;
+            } else if (hasBlackPlayer) {
+                return ChessGame.TeamColor.BLACK;
+            }
+        } else if (hasWhitePlayer) {
+            return ChessGame.TeamColor.BLACK;
+        } else if (hasBlackPlayer) {
+            return ChessGame.TeamColor.WHITE;
+        }
+        return null;
     }
 
     private UserData getUser(String authToken) throws DataAccessException {
