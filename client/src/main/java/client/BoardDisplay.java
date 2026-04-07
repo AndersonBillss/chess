@@ -8,6 +8,46 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class BoardDisplay {
+    private static final String borderEsc = String.format("%s%s%s",
+            EscapeSequences.SET_BG_COLOR_WHITE,
+            EscapeSequences.SET_TEXT_COLOR_BLACK,
+            EscapeSequences.SET_TEXT_BOLD);
+    private static final String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+    private static final String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    private static final String highlightEsc = EscapeSequences.SET_BG_COLOR_YELLOW;
+    private static final String moveLightEsc = EscapeSequences.SET_BG_COLOR_GREEN;
+    private static final String moveDarkEsc = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+    private static final String resetEsc = String.format("%s%s%s",
+            EscapeSequences.RESET_TEXT_COLOR,
+            EscapeSequences.RESET_BG_COLOR,
+            EscapeSequences.RESET_TEXT_BOLD_FAINT);
+    private static final String borderRow = String.format(
+            "%s  %sa %sb %sc %sd %se %sf %sg %sh     %s",
+            borderEsc,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            resetEsc
+    );
+    private static final String borderRowReverse = String.format(
+            "%s  %sh %sg %sf %se %sd %sc %sb %sa     %s",
+            borderEsc,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            EscapeSequences.EMPTY,
+            resetEsc
+    );
+
     public static void show(ChessGame game, ChessGame.TeamColor color) {
         show(game, color, null);
     }
@@ -16,15 +56,7 @@ public class BoardDisplay {
             ChessGame game,
             ChessGame.TeamColor color,
             ChessPosition revealPosition) {
-        String borderEsc = String.format("%s%s%s",
-                EscapeSequences.SET_BG_COLOR_WHITE,
-                EscapeSequences.SET_TEXT_COLOR_BLACK,
-                EscapeSequences.SET_TEXT_BOLD);
-        String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-        String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-        String highlightEsc = EscapeSequences.SET_BG_COLOR_YELLOW;
-        String moveLightEsc = EscapeSequences.SET_BG_COLOR_GREEN;
-        String moveDarkEsc = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+
         Collection<ChessPosition> possiblePositions = new ArrayList<>();
         if (revealPosition != null) {
             var possibleMoves = game.validMoves(revealPosition);
@@ -32,36 +64,6 @@ public class BoardDisplay {
                 possiblePositions.add(move.getEndPosition());
             }
         }
-        String resetEsc = String.format("%s%s%s",
-                EscapeSequences.RESET_TEXT_COLOR,
-                EscapeSequences.RESET_BG_COLOR,
-                EscapeSequences.RESET_TEXT_BOLD_FAINT);
-        String borderRow = String.format(
-                "%s  %sa %sb %sc %sd %se %sf %sg %sh     %s",
-                borderEsc,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                resetEsc
-        );
-        String borderRowReverse = String.format(
-                "%s  %sh %sg %sf %se %sd %sc %sb %sa     %s",
-                borderEsc,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                EscapeSequences.EMPTY,
-                resetEsc
-        );
         if (color == ChessGame.TeamColor.WHITE) {
             System.out.println(borderRow);
         } else {
