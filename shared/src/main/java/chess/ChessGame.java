@@ -197,7 +197,7 @@ public class ChessGame {
         }
         var movingPiece = board.getPiece(move.getStartPosition());
         if (movingPiece.getTeamColor() != getTeamTurn()) {
-            throw new InvalidMoveException("Wrong turn");
+            throw new InvalidMoveException("Wrong color");
         }
         movingPiece.setTimesMoved(movingPiece.getTimesMoved() + 1);
 

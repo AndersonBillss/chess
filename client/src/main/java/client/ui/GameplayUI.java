@@ -10,6 +10,7 @@ import model.GameData;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class GameplayUI implements UI {
     public enum Mode {
@@ -189,7 +190,17 @@ public class GameplayUI implements UI {
     }
 
     private UI resign() {
-        ctx.getPromptManager().println("Not implemented!");
+        ctx.getPromptManager().println("Are you sure you want to resign?");
+        ctx.getPromptManager().print("Type \"yes\" to confirm: ");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        if (!Objects.equals(input.trim().toLowerCase(), "yes")) {
+            return this;
+        }
+        ctx.getWebSocketFacade().resignGame(
+                ctx.getServerFacade().getAuthToken(),
+                ctx.getGame().gameID());
+        ctx.getPromptManager().println("Resigning...");
         return this;
     }
 

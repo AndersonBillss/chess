@@ -116,12 +116,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                         command.getMove().toString()
                 )
         );
-        if (game.game().isInCheck(opposingColor, game.game().getBoard())) {
-            sessions.broadcast(game.gameID(), null,
-                    String.format("%s player is in check!", opposingColor));
-        } else if (game.game().isInCheckmate(opposingColor)) {
+        if (game.game().isInCheckmate(opposingColor)) {
             sessions.broadcast(game.gameID(), null,
                     String.format("%s player is in checkmate!", opposingColor));
+        } else if (game.game().isInCheck(opposingColor)) {
+            sessions.broadcast(game.gameID(), null,
+                    String.format("%s player is in check!", opposingColor));
         } else if (game.game().isInStalemate(opposingColor)) {
             sessions.broadcast(game.gameID(), null,
                     "%s player cannot move. Game ends in stalemate!"
@@ -191,7 +191,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         boolean hasWhitePlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.WHITE);
         boolean isBlackPlayer = Objects.equals(game.blackUsername(), user.username());
         boolean hasBlackPlayer = sessions.hasPlayer(game.gameID(), ChessGame.TeamColor.BLACK);
-        if(hasWhitePlayer && hasBlackPlayer) {
+        if (hasWhitePlayer && hasBlackPlayer) {
             return null;
         }
         if (isWhitePlayer && hasWhitePlayer) {

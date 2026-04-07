@@ -110,7 +110,7 @@ public class PostloginUI implements UI {
             return null;
         }
 
-        if (gameIndex > games.size() || gameIndex < 0) {
+        if (gameIndex >= games.size() || gameIndex < 0) {
             ctx.getPromptManager().println("Game does not exist: " + (gameIndex + 1));
             return null;
         }
