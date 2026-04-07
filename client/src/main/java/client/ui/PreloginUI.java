@@ -32,7 +32,7 @@ public class PreloginUI implements UI {
         ctx.getPromptManager().println("  Register new user: \"register\" <USERNAME> <PASSWORD> <EMAIL>");
         ctx.getPromptManager().println("  Login as existing user: \"login\" <USERNAME> <PASSWORD>");
         ctx.getPromptManager().println("  Exit the program: \"quit\"");
-        ctx.getPromptManager().println("  Print this message: \"help\"\n");
+        ctx.getPromptManager().println("  Print this message: \"help\"");
         return this;
     }
 

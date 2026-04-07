@@ -47,7 +47,7 @@ public class PostloginUI implements UI {
         ctx.getPromptManager().println("  Join a game: \"join\" <ID> [WHITE|BLACK]");
         ctx.getPromptManager().println("  Observe a game: \"observe\" <ID> - a game");
         ctx.getPromptManager().println("  Logout: \"logout\"");
-        ctx.getPromptManager().println("  Print this message: \"help\"\n");
+        ctx.getPromptManager().println("  Print this message: \"help\"");
         return this;
     }
 
