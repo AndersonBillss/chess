@@ -8,22 +8,22 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class BoardDisplay {
-    private static final String borderEsc = String.format("%s%s%s",
+    private static final String BORDER_ESC = String.format("%s%s%s",
             EscapeSequences.SET_BG_COLOR_WHITE,
             EscapeSequences.SET_TEXT_COLOR_BLACK,
             EscapeSequences.SET_TEXT_BOLD);
-    private static final String cellWhiteEsc = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-    private static final String cellBlackEsc = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-    private static final String highlightEsc = EscapeSequences.SET_BG_COLOR_YELLOW;
-    private static final String moveLightEsc = EscapeSequences.SET_BG_COLOR_GREEN;
-    private static final String moveDarkEsc = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
-    private static final String resetEsc = String.format("%s%s%s",
+    private static final String CELL_WHITE_ESC = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+    private static final String CELL_BLACK_ESC = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    private static final String HIGHLIGHT_ESC = EscapeSequences.SET_BG_COLOR_YELLOW;
+    private static final String MOVE_LIGHT_ESC = EscapeSequences.SET_BG_COLOR_GREEN;
+    private static final String MOVE_DARK_ESC = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+    private static final String RESET_ESC = String.format("%s%s%s",
             EscapeSequences.RESET_TEXT_COLOR,
             EscapeSequences.RESET_BG_COLOR,
             EscapeSequences.RESET_TEXT_BOLD_FAINT);
-    private static final String borderRow = String.format(
+    private static final String BORDER_ROW = String.format(
             "%s  %sa %sb %sc %sd %se %sf %sg %sh     %s",
-            borderEsc,
+            BORDER_ESC,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
@@ -32,11 +32,11 @@ public class BoardDisplay {
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
-            resetEsc
+            RESET_ESC
     );
-    private static final String borderRowReverse = String.format(
+    private static final String BORDER_ROW_REVERSE = String.format(
             "%s  %sh %sg %sf %se %sd %sc %sb %sa     %s",
-            borderEsc,
+            BORDER_ESC,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
@@ -45,7 +45,7 @@ public class BoardDisplay {
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
             EscapeSequences.EMPTY,
-            resetEsc
+            RESET_ESC
     );
 
     public static void show(ChessGame game, ChessGame.TeamColor color) {
@@ -65,9 +65,9 @@ public class BoardDisplay {
             }
         }
         if (color == ChessGame.TeamColor.WHITE) {
-            System.out.println(borderRow);
+            System.out.println(BORDER_ROW);
         } else {
-            System.out.println(borderRowReverse);
+            System.out.println(BORDER_ROW_REVERSE);
         }
 
         for (int i = 0; i < 16; i++) {
@@ -78,15 +78,15 @@ public class BoardDisplay {
             }
             String borderCell = String.format(
                     "%s %d %s",
-                    borderEsc,
+                    BORDER_ESC,
                     row + 1,
-                    resetEsc
+                    RESET_ESC
             );
             if (onRowTop) {
                 borderCell = String.format(
                         "%s   %s",
-                        borderEsc,
-                        resetEsc);
+                        BORDER_ESC,
+                        RESET_ESC);
             }
             System.out.print(borderCell);
             for (int j = 0; j < 8; j++) {
@@ -98,13 +98,13 @@ public class BoardDisplay {
                 int colPattern = col % 2 == 0 ? 1 : -1;
                 boolean isWhiteCell = rowPattern * colPattern == -1;
                 ChessPosition currPosition = new ChessPosition(row + 1, col + 1);
-                String cellEsc = isWhiteCell ? cellWhiteEsc : cellBlackEsc;
+                String cellEsc = isWhiteCell ? CELL_WHITE_ESC : CELL_BLACK_ESC;
                 boolean isHighlighted = Objects.equals(currPosition, revealPosition);
                 boolean isRevealed = possiblePositions.contains(currPosition);
                 if (isHighlighted) {
-                    cellEsc = highlightEsc;
+                    cellEsc = HIGHLIGHT_ESC;
                 } else if (isRevealed) {
-                    cellEsc = isWhiteCell ? moveLightEsc : moveDarkEsc;
+                    cellEsc = isWhiteCell ? MOVE_LIGHT_ESC : MOVE_DARK_ESC;
                 }
                 System.out.printf("%s ", cellEsc);
                 ChessPiece piece = game.getBoard().getPiece(currPosition);
@@ -119,9 +119,9 @@ public class BoardDisplay {
         }
 
         if (color == ChessGame.TeamColor.WHITE) {
-            System.out.println(borderRow);
+            System.out.println(BORDER_ROW);
         } else {
-            System.out.println(borderRowReverse);
+            System.out.println(BORDER_ROW_REVERSE);
         }
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
         System.out.print(EscapeSequences.RESET_BG_COLOR);
