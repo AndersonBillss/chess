@@ -70,22 +70,44 @@ public class GameplayUI implements UI {
 
     @Override
     public UI handleInput(String[] input) {
-        return switch (input[0].toLowerCase()) {
-            case "help" -> help();
-            case "leave" -> leave();
-            case "move" -> move(input);
-            case "resign" -> resign();
-            case "highlight" -> highlight(input);
-            default -> unknownCommand(input);
-        };
+        if(mode == Mode.OBSERVER) {
+            return switch (input[0].toLowerCase()) {
+                case "help" -> help();
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "highlight" -> highlight(input);
+                default -> unknownCommand(input);
+            };
+        } else {
+            return switch (input[0].toLowerCase()) {
+                case "help" -> help();
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "highlight" -> highlight(input);
+                case "move" -> move(input);
+                case "resign" -> resign();
+                default -> unknownCommand(input);
+            };
+        }
+    }
+
+    private UI redraw() {
+        BoardDisplay.show(this.ctx.getGame().game(), getColor());
+        return this;
     }
 
     private UI help() {
-        ctx.getPromptManager().println("  Redraw the board: \"redraw\"");
-        ctx.getPromptManager().println("  Leave the game: \"leave\"");
-        ctx.getPromptManager().println("  Make a move: \"move\" <START> <END>");
-        ctx.getPromptManager().println("  Resign from a game: \"resign\"");
-        ctx.getPromptManager().println("  Highlight legal moves: \"highlight\"");
+        if(mode == Mode.OBSERVER) {
+            ctx.getPromptManager().println("  Redraw the board: \"redraw\"");
+            ctx.getPromptManager().println("  Leave the game: \"leave\"");
+            ctx.getPromptManager().println("  Highlight legal moves: \"highlight\"");
+        } else {
+            ctx.getPromptManager().println("  Redraw the board: \"redraw\"");
+            ctx.getPromptManager().println("  Leave the game: \"leave\"");
+            ctx.getPromptManager().println("  Highlight legal moves: \"highlight\"");
+            ctx.getPromptManager().println("  Make a move: \"move\" <START> <END>");
+            ctx.getPromptManager().println("  Resign from a game: \"resign\"");
+        }
         return this;
     }
 
